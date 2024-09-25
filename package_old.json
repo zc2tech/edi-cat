@@ -1,0 +1,327 @@
+{
+  "name": "vscode-edi-cat",
+  "displayName": "edi-cat",
+  "description": "Help to validate and create X12/EDIFACT document",
+  "icon": "img/icon.png",
+  "version": "0.0.1",
+  "private": true,
+  "publisher": "Julian Xu",
+  "engines": {
+    "vscode": "^1.83.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Formatters"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+			"activitybar": [
+				{
+					"id": "package-explorer",
+					"title": "Package Explorer",
+					"icon": "media/dep.svg"
+				}
+			]
+		},
+    "views": {
+      "explorer": [
+        {
+          "id": "edi-cat.treeAssistantExplorer",
+          "name": "EDI Cat Assistant Explorer",
+          "when": "showEdiCatAssistant",
+          "icon": "./img/icon-600x600.svg",
+          "contextualTitle": "EDI Cat Assistant Explorer"
+        }
+      ]
+      
+    },
+    "languages": [
+      {
+        "id": "edifact",
+        "aliases": [
+          "EDIFACT",
+          "EDI"
+        ],
+        "extensions": [
+          ".edi",
+          ".edifact"
+        ],
+        "configuration": "./edifact.configuration.json"
+      },
+      {
+        "id": "x12",
+        "aliases": [
+          "Electronic Data Interchange (X12)"
+        ],
+        "extensions": [
+          ".x12"
+        ],
+        "configuration": "./x12.configuration.json"
+      },
+      {
+        "id": "pair",
+        "aliases": [
+          "Key => Value pair file"
+        ],
+        "extensions": [
+          ".pair"
+        ]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "edifact",
+        "scopeName": "text.plain.edifact",
+        "path": "./tm_language/edifact.json"
+      },
+      {
+        "language": "x12",
+        "scopeName": "text.plain.x12",
+        "path": "./tm_language/x12.json"
+      },
+      {
+        "language": "pair",
+        "scopeName": "text.plain.pair",
+        "path": "./tm_language/pair.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "edi-cat.prettify",
+        "title": "Prettify (format using new lines)",
+        "category": "EDI Cat",
+        "icon": "$(ungroup-by-ref-type)"
+      },
+      {
+        "command": "edi-cat.minify",
+        "title": "Minify (remove all new lines)",
+        "category": "EDI Cat",
+        "icon": "$(group-by-ref-type)"
+      },
+      {
+        "command": "edi-cat.putAllSegmentsToSingleLine",
+        "title": "EDIFACT, multi-line to one"
+      },
+      {
+        "command": "edi-cat.x12.goto",
+        "title": "Goto",
+        "category": "EDI Cat"
+      },
+      {
+        "command": "edi-cat.x12.convert-separators",
+        "title": "Convert Separators (Normalize/change EDI separators)",
+        "category": "EDI Cat"
+      },     
+      {
+        "command": "edi-cat.refreshTreeAssistantExplorer",
+        "title": "Refresh Assistant Explorer",
+        "category": "EDI Cat",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "edi-cat.addAssistantGroupSegment",
+        "title": "Add Assistant Group/Segment",
+        "category": "EDI Cat Internal",
+        "icon": "$(add)"
+      },
+      {
+        "command": "edi-cat.parseDocument",
+        "title": "Parse Document",
+        "category": "EDI Cat Internal",
+        "icon": "$(add)"
+      },
+      {
+				"category": "Configuration Sample",
+				"command": "config.commands.configureViewOnWindowOpen",
+				"title": "Configure view to show on window open"
+			},
+			{
+				"category": "Configuration Sample",
+				"command": "config.commands.configureEmptyLastLineCurrentFile",
+				"title": "Configure empty last line for current file"
+			},
+			{
+				"category": "Configuration Sample",
+				"command": "config.commands.configureEmptyLastLineFiles",
+				"title": "Configure empty last line for files"
+			},
+			{
+				"category": "Configuration Sample",
+				"command": "config.commands.overrideLanguageValue",
+				"title": "Configure show size for language"
+			},
+			{
+				"category": "EDI Cat Internal",
+				"command": "edi-cat.showCodeList",
+				"title": "Open Code List"
+			}
+    ],
+    "menus": {
+      "commandPalette": [],
+      "editor/title": [
+        {
+          "when": "config.edi-cat.menu.icon && (resourceLangId == x12 || resourceLangId == edifact)",
+          "command": "edi-cat.prettify",
+          "group": "navigation"
+        },
+        {
+          "when": "config.edi-cat.menu.icon && (resourceLangId == x12 || resourceLangId == edifact)",
+          "command": "edi-cat.minify",
+          "group": "navigation"
+        },
+        {
+          "when": "config.edi-cat.menu.icon && (resourceLangId == x12 || resourceLangId == edifact)",
+          "command": "edi-cat.toggleInlayHints",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "when": "resourceLangId == x12",
+          "command": "edi-cat.x12.prettify",
+          "group": "x12"
+        }
+      ],
+      "view/title": [
+        {
+          "when": "view == edi-cat-explorer",
+          "command": "edi-cat.prettify",
+          "group": "format"
+        },
+        {
+          "when": "view == edi-cat-explorer",
+          "command": "edi-cat.minify",
+          "group": "format"
+        },
+        {
+          "when": "view == edi-cat.treeAssistantExplorer",
+          "command": "edi-cat.refreshTreeAssistantExplorer",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+				{
+					"command": "edi-cat.addAssistantGroupSegment",
+					"when": "view == edi-cat.treeAssistantExplorer && viewItem == insertable",
+					"group": "inline"
+				}
+      ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "EDI Cat Configuration",
+      "properties": {
+        "edi-cat.x12.separator.data": {
+          "type": "string",
+          "default": "*",
+          "required": true,
+          "description": "A single character, which acts as a separator between data elements within a segment.",
+          "pattern": "^.?$"
+        },
+        "edi-cat.enableCodelens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable codelens for EDI messages."
+        },
+        "edi-cat.enableDiagnosis": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable Diagnosis for EDI messages."
+        },
+        "edi-cat.enableHover": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable hover for EDI messages."
+        },
+        "edi-cat.inlayHints.segmentNames": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show inlay hints for segment names."
+        },
+        "edi-cat.inlayHints.elements": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show inlay hints for elements."
+        },
+        "edi-cat.menu.icon": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show action icons in the title area of editor."
+        },
+        "edi-cat.x12.separator.component": {
+          "type": "string",
+          "default": ":",
+          "required": true,
+          "description": "A single character, which acts as a separator between composite elements within a segment.",
+          "pattern": "^.?$"
+        },
+        "edi-cat.x12.separator.repetition": {
+          "type": "string",
+          "default": ">",
+          "required": true,
+          "description": "A single character, which acts as a separator between repeating data elements within a segment.",
+          "pattern": "^.?$"
+        },
+        "edi-cat.x12.separator.segment": {
+          "type": "string",
+          "default": "~",
+          "required": true,
+          "description": "A single character, which acts as a segment terminator separating multiple segments.",
+          "pattern": "^.?$"
+        },
+        "edi-cat.x12.telemetry.disabled": {
+          "type": "boolean",
+          "default": true,
+          "required": false,
+          "description": "Disable telemetry of both usage metrics and error reporting."
+        },
+        "conf.view.showOnWindowOpen": {
+          "type": "string",
+          "enum": [
+            "explorer",
+            "search",
+            "scm",
+            "debug",
+            "extensions"
+          ],
+          "default": "explorer",
+          "description": "Window configuration: View to show always when a window opens",
+          "scope": "window"
+        },
+        "conf.resource.insertEmptyLastLine": {
+          "type": "object",
+          "default": {},
+          "description": "Resource configuration: Configure files using glob patterns to have an empty last line always",
+          "scope": "resource"
+        },
+        "conf.language.showSize": {
+          "type": "boolean",
+          "default": false,
+          "description": "Shows the size of the document",
+          "scope": "language-overridable"
+        }
+      }
+    }
+  },
+  "author": {
+    "name": "Julian Xu",
+    "email": "julian.xu@aliyun.com"
+  },
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "lint": "eslint \"src/**/*.ts\"",
+    "watch": "tsc -w -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^16.18.34",
+    "@types/vscode": "^1.73.0",
+    "@types/vscode-webview": "^1.57.0",
+    "@typescript-eslint/eslint-plugin": "^6.7.0",
+    "@typescript-eslint/parser": "^6.7.0",
+    "eslint": "^8.26.0",
+    "typescript": "^5.2.2"
+  }
+}
