@@ -13,9 +13,16 @@ import { XmlConverterBase } from "../converter/xmlConverterBase";
 import { DOMParser } from "@xmldom/xmldom";
 import { Cvt_Receipt_RECADV } from "../converter/xmlToD96A/cvt_Receipt_RECADV";
 import { Cvt_SUR_824 } from "../converter/xmToX12/cvt_SUR_824";
-import { cvt_Order_ORDERS } from "../converter/xmlToD96A/cvt_Order_ORDERS";
-import { cvt_Order_ORDCHG } from "../converter/xmlToD96A/cvt_Order_ORDCHG";
-import { cvt_Forecast_DELFOR } from "../converter/xmlToD96A/cvt_Forecast_DELFOR";
+import { Cvt_Order_ORDERS } from "../converter/xmlToD96A/cvt_Order_ORDERS";
+import { Cvt_Order_ORDCHG } from "../converter/xmlToD96A/cvt_Order_ORDCHG";
+import { Cvt_Forecast_DELFOR } from "../converter/xmlToD96A/cvt_Forecast_DELFOR";
+import { Cvt_OrderConfirmation_ORDRSP } from "../converter/xmlToD96A/cvt_OrderConfirmation_ORDRSP";
+import { Cvt_ShipNotice_DESADV } from "../converter/xmlToD96A/cvt_ShipNotice_DESADV";
+import { Cvt_Invoice_INVOIC } from "../converter/xmlToD96A/cvt_Invoice_INVOIC";
+import { format, parse } from "date-fns";
+import { Cvt_OrderConfrimation_855 } from "../converter/xmToX12/cvt_OrderConfrimation_855";
+import { Cvt_Invoice_810 } from "../converter/xmToX12/cvt_Invoice_810";
+import { Cvt_ShipNotice_856 } from "../converter/xmToX12/cvt_ShipNotice_856";
 const sAttXmlLang = 'xml:lang';
 export class AllConversionCommand {
 
@@ -137,12 +144,100 @@ export class AllConversionCommand {
         }
     }
 
+    private _fromXML_check(vsdoc: vscode.TextDocument):boolean {
+        let dom = new DOMParser().parseFromString(vsdoc.getText(), 'text/xml');
+        // RECADV
+        const nReceipt = xpath.select1("/cXML/Request/ReceiptRequest/ReceiptRequestHeader", dom);
+        if (nReceipt) {
+            return true;
+        }
+
+        // OC ORDRSP
+        const nOC = xpath.select1("/cXML/Request/ConfirmationRequest/ConfirmationHeader", dom);
+        if (nOC) {
+            return true;
+        }
+
+        // ASN DESADV
+        const nASN = xpath.select1("/cXML/Request/ShipNoticeRequest/ShipNoticeHeader", dom);
+        if (nASN) {
+           return true;
+        }
+        // Invoice INVOIC
+        const nInv = xpath.select1("/cXML/Request/InvoiceDetailRequest/InvoiceDetailRequestHeader", dom);
+        if (nInv) {
+            return true;
+        }
+
+        // Order
+        // const nOrder = xpath.select1("/cXML/Request/OrderRequest/OrderRequestHeader", dom);
+        // const nRequestHeader = this._rn('/OrderRequest/OrderRequestHeader', dom);
+        // if (nOrder) {
+        //    return true;
+        // }
+
+        // Forecast
+        const nHeader = xpath.select1("/cXML/Message/ProductActivityMessage/ProductActivityHeader", dom) as Element;
+        if (nHeader) {
+           return true;
+        }
+
+        // 824, StatusUpdateRequest
+        const nDocStatus = xpath.select1("/cXML/Request/StatusUpdateRequest/DocumentStatus", dom);
+        const nInvStatus = xpath.select1("/cXML/Request/StatusUpdateRequest/InvoiceStatus", dom);
+        if (nDocStatus || nInvStatus) {
+            return true;
+        }
+        return false;
+    }
     private _findCvt(vsdoc: vscode.TextDocument, sPattern: String): XmlConverterBase | undefined {
+
+        // sPattern:
+        // cXML_to_EDIFACT_D96A = 'cXML_to_EDIFACT_D96A',
+        // EDIFACT_D96A_to_cXML = 'EDIFACT_D96A_to_cXML',
+        // cXML_to_X12 = 'cXML_to_X12',
+
         let dom = new DOMParser().parseFromString(vsdoc.getText(), 'text/xml');
         // RECADV
         const nReceipt = xpath.select1("/cXML/Request/ReceiptRequest/ReceiptRequestHeader", dom);
         if (nReceipt) {
             return new Cvt_Receipt_RECADV();
+        }
+
+        // OC ORDRSP
+        const nOC = xpath.select1("/cXML/Request/ConfirmationRequest/ConfirmationHeader", dom);
+        if (nOC) {
+            if (sPattern == 'cXML_to_EDIFACT_D96A') {
+                return new Cvt_OrderConfirmation_ORDRSP();
+            } else if (sPattern == 'cXML_to_X12') {
+                return new Cvt_OrderConfrimation_855();
+            } else {
+                vscode.window.showErrorMessage
+                    (`Unknow Patter: ${sPattern} for OC conversion`);
+            }
+        }
+
+        // ASN DESADV
+        const nASN = xpath.select1("/cXML/Request/ShipNoticeRequest/ShipNoticeHeader", dom);
+        if (nASN) {
+            if (sPattern == 'cXML_to_EDIFACT_D96A') {
+                return new Cvt_ShipNotice_DESADV();
+            } else if (sPattern == 'cXML_to_X12') {
+                return new Cvt_ShipNotice_856();
+            } else {
+                vscode.window.showErrorMessage
+                    (`Unknow Patter: ${sPattern} for ASN conversion`);
+            }
+        }
+        // Invoice INVOIC
+        const nInv = xpath.select1("/cXML/Request/InvoiceDetailRequest/InvoiceDetailRequestHeader", dom);
+        if (nInv) {
+            if (sPattern == 'cXML_to_EDIFACT_D96A') {
+                return new Cvt_Invoice_INVOIC();
+            } else if (sPattern == 'cXML_to_X12') {
+                return new Cvt_Invoice_810();
+            }
+            
         }
 
         // Order
@@ -151,16 +246,16 @@ export class AllConversionCommand {
         if (nOrder) {
             let sType = this._v('@type', nRequestHeader);
             if (sType == 'new') {
-                return new cvt_Order_ORDERS();
+                return new Cvt_Order_ORDERS();
             } else {
-                return new cvt_Order_ORDCHG();
+                return new Cvt_Order_ORDCHG();
             }
         }
 
         // Forecast
         const nHeader = xpath.select1("/cXML/Message/ProductActivityMessage/ProductActivityHeader", dom) as Element;
         if (nHeader) {
-            return new cvt_Forecast_DELFOR();
+            return new Cvt_Forecast_DELFOR();
             // let sType = this._v('@processType', nHeader);
             // if (sType == 'Forecast') {
             //     return new cvt_Forecast_DELFOR();
@@ -180,10 +275,15 @@ export class AllConversionCommand {
      * @returns 
      */
     private async _fromXML(vsdoc: vscode.TextDocument) {
+        if(!this._fromXML_check(vsdoc)) {
+            vscode.window.showErrorMessage
+                    (`Cannot convert this type of XML to other EDI document, please try ASN, OrderConfirmation, Invoice. `);
+                return;
+        }
         const selected = await vscode.window.showQuickPick(
             [
-                { label: ConvertPattern.cXML_to_EDIFACT_D96A, description: 'Convert to EDIFACT D96A' },
                 { label: ConvertPattern.cXML_to_X12, description: 'Convert to X12' },
+                { label: ConvertPattern.cXML_to_EDIFACT_D96A, description: 'Convert to EDIFACT D96A' },
             ],
             { placeHolder: 'Select object EDI type.' }
         );
@@ -198,14 +298,60 @@ export class AllConversionCommand {
         cvt = this._findCvt(vsdoc, sPattern);
         if (cvt) {
             const astStr: string = cvt.fromXML(vsdoc);
-            const newDoc = await vscode.workspace.openTextDocument(
-                { content: astStr, language: this._getObjLanguageFromPattern(sPattern) });
-            await vscode.window.showTextDocument(newDoc);
+            // const newDoc = await vscode.workspace.openTextDocument(
+            //     { content: astStr, language: this._getObjLanguageFromPattern(sPattern) });
+            // await vscode.window.showTextDocument(newDoc);
+            const sFileUri = this._newFilePath(this._getFileExtFromPattern(sPattern));
+            if (!sFileUri) {
+                vscode.window.showErrorMessage
+                    (`Failed creating converted file for: ${vsdoc.fileName}`);
+                return;
+            }
+            await this.createAndOpenEmptyFile(sFileUri, astStr);
+            const fileUri = vscode.Uri.file(sFileUri);
+            let document = await vscode.workspace.openTextDocument(fileUri);
+            let editor = await vscode.window.showTextDocument(document);
 
+            // // Fill the file with the text you want
+            // let range = new vscode.Range(0, 0, document.lineCount, 0);
+            // let edit = new vscode.WorkspaceEdit();
+            // edit.replace(fileUri, range, astStr);
+            // await vscode.workspace.applyEdit(edit);
+
+            // // Save the file
+            // await document.save();
         }
 
     }
 
+    async createAndOpenEmptyFile(sFileUri: string, sContent: string) {
+        const fileUri = vscode.Uri.file(sFileUri);
+        //const emptyContent = new TextEncoder().encode('');
+
+        try {
+            await vscode.workspace.fs.writeFile(fileUri, new TextEncoder().encode(sContent));
+            //const document = await vscode.workspace.openTextDocument(fileUri);
+            //await vscode.window.showTextDocument(document);
+        } catch (error) {
+            console.error('Error creating or opening file:', error);
+        }
+    }
+
+    private _newFilePath(ext: string): string {
+        let currentEditor = vscode.window.activeTextEditor;
+        if (currentEditor) {
+            let currentFilePath = currentEditor.document.fileName;
+            // let currentFileBasename = path.basename(currentFilePath);
+            let currentFileBasename = path.parse(currentFilePath).name;
+
+            // let timestamp = format(new Date(), 'yyyy-MM-dd-HHmmssxxx');
+            let timestamp = format(new Date(), 'yyyy-MM-dd-HHmmss');
+            let newFileName = `${currentFileBasename}-${timestamp}${ext}`;
+            let newFilePath = path.join(path.dirname(currentFilePath), newFileName);
+            return newFilePath;
+        }
+        return;
+    }
     private _getObjLanguageFromPattern(sPattern): string {
         switch (sPattern) {
             case ConvertPattern.X12_to_cXML:
@@ -216,6 +362,18 @@ export class AllConversionCommand {
                 return 'x12';
         }
     }
+    private _getFileExtFromPattern(sPattern): string {
+        switch (sPattern) {
+            case ConvertPattern.X12_to_cXML:
+            case ConvertPattern.EDIFACT_D96A_to_cXML:
+                return '.xml';
+            case ConvertPattern.cXML_to_EDIFACT_D96A:
+                return '.edi';
+            case ConvertPattern.cXML_to_X12:
+                return '.x12';
+        }
+    }
+
     private async _fromX12orEDI(vsdoc: vscode.TextDocument) {
         const tmp = await ParserUtils.getSegmentParser(vsdoc);
         const segParser = tmp.parser;
@@ -231,7 +389,7 @@ export class AllConversionCommand {
             return;
         }
 
-        if (vscode.workspace.getConfiguration(constants.configuration.ediTsuya).get(constants.configuration.enableDiagnosis) !== true) {
+        if (vscode.workspace.getConfiguration(constants.configuration.ediCat).get(constants.configuration.enableDiagnosis) !== true) {
             vscode.window.showErrorMessage
                 (`Please enable Diagnosis setting before run this command.`);
             return;
@@ -280,14 +438,26 @@ export class AllConversionCommand {
 
         const cvtResult: string = syntaxParser.convert(this._toPattern(sPattern));
 
-        let lang: string;
-        if (EdiUtils.isTxtXML(cvtResult)) {
-            lang = 'xml';
-        } else {
-            lang = 'txt';
+        // let lang: string;
+        // if (EdiUtils.isTxtXML(cvtResult)) {
+        //     lang = 'xml';
+        // } else {
+        //     lang = 'txt';
+        // }
+
+        const sFileUri = this._newFilePath(this._getFileExtFromPattern(sPattern));
+        if (!sFileUri) {
+            vscode.window.showErrorMessage
+                (`Failed creating converted file for: ${vsdoc.fileName}`);
+            return;
         }
-        const newDoc = await vscode.workspace.openTextDocument({ content: cvtResult, language: lang });
-        await vscode.window.showTextDocument(newDoc);
+        await this.createAndOpenEmptyFile(sFileUri, cvtResult);
+        const fileUri = vscode.Uri.file(sFileUri);
+        let document = await vscode.workspace.openTextDocument(fileUri);
+        let editor = await vscode.window.showTextDocument(document);
+
+        // const newDoc = await vscode.workspace.openTextDocument({ content: cvtResult, language: lang });
+        // await vscode.window.showTextDocument(newDoc);
 
     }
 

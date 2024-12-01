@@ -17,7 +17,7 @@ export abstract class HoverProviderBase implements vscode.HoverProvider {
   parsedDocMap: { [key: string]: FileParserMeta }[];
 
   async provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover | undefined | null> {
-    if (vscode.workspace.getConfiguration(constants.configuration.ediTsuya).get(constants.configuration.enableHover) !== true) {
+    if (vscode.workspace.getConfiguration(constants.configuration.ediCat).get(constants.configuration.enableHover) !== true) {
       return null;
     }
 

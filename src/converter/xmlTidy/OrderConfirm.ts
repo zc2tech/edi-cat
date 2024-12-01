@@ -90,6 +90,9 @@ export class TidyConfirmationStatus
         t.ScheduleLineReference.import(this.ScheduleLineReference);
         t.ComponentConsumptionDetails.import(this.ComponentConsumptionDetails); t.Comments.import(this.Comments);
         t.Extrinsic.import(this.Extrinsic);
+        for(let k in this._objAtt) {
+            t.att(k,this._objAtt[k]);
+        }
         return t;
     }
 }

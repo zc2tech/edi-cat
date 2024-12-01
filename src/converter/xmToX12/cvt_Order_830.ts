@@ -198,37 +198,47 @@ export class Cvt_Order_830 extends XmlConverterBase {
         this._setV(N1, 4, this._v('Address/@addressID', nBP));
 
         // N2
-        let sDeliverTo = this._v('Address/PostalAddress/DeliverTo', nBP);
-        this._splitStrX12(sDeliverTo, 'N2', 60);
-
+        let nDeliverTos = this._es('Address/PostalAddress/DeliverTo', nBP);
+        this._oneSegX12(nDeliverTos,'N2');
+      
         // N3
-        let sStreet = this._v('Address/PostalAddress/Street', nBP);
-        this._splitStrX12(sStreet, 'N3', 55);
+        let nStreets = this._es('Address/PostalAddress/Street',nBP);
+        this._oneSegX12(nStreets,'N3');
 
         // N4
-        let N4 = this._initSegX12('N4', 6);
-        let sCountryCode = this._v('Address/PostalAddress/Country/@isoCountryCode', nBP);
-        let sState = this._v('/Address/PostalAddress/State', nBP);
-        if (sCountryCode == 'CA' || sCountryCode == 'US') {
-            this._setV(N4, 2, this._mci(MAPS_XML_X12.mapN4_156, sState));
-        } else {
-            this._setV(N4, 5, 'SP'); // Hardcode to "SP" only if N406 is mapped
-            this._setV(N4, 6, sState);
+        let vPostalCode = this._v('Address/PostalAddress/PostalCode', nBP);
+        if (vPostalCode) {
+            let N4 = this._initSegX12('N4', 6);
+            let sCountryCode = this._v('Address/PostalAddress/Country/@isoCountryCode', nBP);
+            let sState = this._v('/Address/PostalAddress/State', nBP);
+            if (sCountryCode == 'CA' || sCountryCode == 'US') {
+                this._setV(N4, 2, this._mci(MAPS_XML_X12.mapN4_156, sState));
+            } else {
+                this._setV(N4, 5, 'SP'); // Hardcode to "SP" only if N406 is mapped
+                this._setV(N4, 6, sState);
+            }
+            this._setV(N4, 3, vPostalCode);
+            this._setV(N4, 4, sCountryCode);
         }
-        this._setV(N4, 3, this._v('Address/PostalAddress/PostalCode', nBP));
-        this._setV(N4, 4, sCountryCode);
 
         // REF Idreference
-        let sDomain = this._v('IdReference/@domain',nBP);
-        if(sDomain && this._mei(MAPS.mapN1_BP_REF128,sDomain)) {
-            let REF = this._initSegX12('REF', 3);
-            this._setV(REF,1,this._mci(MAPS.mapN1_BP_REF128,sDomain));
-            this._setV(REF,3,this._v('Address/PostalAddress/@name',nBP));
+        let sDomain = this._v('IdReference/@domain', nBP);
+        if (sDomain) {
+            if (this._mei(MAPS.mapN1_BP_REF128, sDomain)) {
+                let REF = this._initSegX12('REF', 3);
+                this._setV(REF, 1, this._mci(MAPS.mapN1_BP_REF128, sDomain));
+                this._setV(REF, 3, this._v('Address/PostalAddress/@name', nBP));
+            } else {
+                let REF = this._initSegX12('REF', 3);
+                this._setV(REF, 1, this._mci(MAPS.mapN1_BP_REF128, sDomain));
+                this._setV(REF, 2, 'ZZ');
+                this._setV(REF, 3, sDomain);
+            }
         }
 
         // REF ME
-        let sRefName = this._v('Address/PostalAddress/@name',nBP);
-        
+        let sRefName = this._v('Address/PostalAddress/@name', nBP);
+
 
 
     } // end function _GroupN1

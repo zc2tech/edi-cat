@@ -43,7 +43,7 @@ export class ParseDocumentCommand {
       return;
     }
 
-    if (vscode.workspace.getConfiguration(constants.configuration.ediTsuya).get(constants.configuration.enableDiagnosis) !== true) {
+    if (vscode.workspace.getConfiguration(constants.configuration.ediCat).get(constants.configuration.enableDiagnosis) !== true) {
       vscode.window.showErrorMessage
         (`Please enable Diagnosis setting before run this command.`);
       return;

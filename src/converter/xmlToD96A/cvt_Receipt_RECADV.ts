@@ -181,7 +181,7 @@ export class Cvt_Receipt_RECADV extends XmlConverterBase {
         let sShortName = this._v('ShortName', nRefDesc);
         
         // IMD F
-        let sDesc = this._extractText(nRefDesc); // to avoid null value;
+        let sDesc = this._vt(nRefDesc); // to avoid null value;
         if (sDesc) {
             let IMDF = this._initSegEdi('IMD', 3);
             this._setV(IMDF, 1, 'F');

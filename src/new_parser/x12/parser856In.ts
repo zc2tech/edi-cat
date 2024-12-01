@@ -8,7 +8,7 @@ import { SyntaxParserBase, ASTNode, ASTNodeType, ASTOp, ASTOpType } from "../syn
 import { DocInfoBase } from "../../info/docInfoBase";
 import { Info_856_In } from "../../info/info_856_In";
 import { ConvertPattern } from "../../cat_const";
-import { Cvt_856_ShipNotice } from "../../converter/x12toXml/cvt856_ShipNotice";
+import { Cvt_856_ShipNotice } from "../../converter/x12toXml/cvt_856_ShipNotice";
 
 
 /**

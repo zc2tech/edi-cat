@@ -21,7 +21,7 @@ function getClassName(s) {
     return 'Tidy' + matchName[1];
 }
 // Test the function.
-var str = "\n<!ELEMENT ItemDetailRetail (EANID?, EuropeanWasteCatalogID?, Characteristic* )>\n";
+var str = "\n<!ELEMENT InvoiceDetailItemRetail (AdditionalPrices?, TotalRetailAmount?, ItemIndicator*, PromotionDealID?, PromotionVariantID?)>\n";
 var arrFields = getContents(str);
 var className = getClassName(str);
 // export class TidyItemID extends TidyBase {

@@ -28,7 +28,7 @@ import { MAPStoXML } from "../converterBase";
 *										
 *
 */
-export class cvt_Forecast_DELFOR extends XmlConverterBase {
+export class Cvt_Forecast_DELFOR extends XmlConverterBase {
     protected _convertErrs: ConvertErr[];
     protected _bHideAmount = false;
     protected _bHideUnitPrice = false;
@@ -78,7 +78,7 @@ export class cvt_Forecast_DELFOR extends XmlConverterBase {
         // RFF
         let nIdentity = this._prn('/cXML/Header/From/Credential [@domain="SystemID"]/Identity');
         if (nIdentity) {
-            this._RFF_KV('MS', this._v('', nIdentity));
+            this._RFF_KV_EDI('MS', this._v('', nIdentity));
         }
 
         // SG2
@@ -337,12 +337,16 @@ export class cvt_Forecast_DELFOR extends XmlConverterBase {
         for (let nChar of nChars) {
             let vCharDomain = this._v('@domain', nChar);
             if (vCharDomain) {
+                let IMD = this._initSegEdi('IMD', 3);
+                this._setV(IMD, 1, 'B');
+                this._setV(IMD, 301, this._v('@value', nChar));
                 let vMapped = this._mci(MAPS.mapIMD7081, vCharDomain);
                 if (vMapped) {
-                    let IMD = this._initSegEdi('IMD', 3);
-                    this._setV(IMD, 1, 'B');
+
                     this._setV(IMD, 2, vMapped);
-                    this._setV(IMD, 301, this._v('@value', nChar));
+
+                } else {
+                    this._setV(IMD, 2, '79');
                 }
             }
         }
@@ -432,7 +436,7 @@ export class cvt_Forecast_DELFOR extends XmlConverterBase {
                         // @type="any other than ~custom~"
                         vTrueType = vType;
                     }
-                    this._RFF_KV('AEH', vTrueType);
+                    this._RFF_KV_EDI('AEH', vTrueType);
                 }
             } // end loop nDetails
 
@@ -468,7 +472,7 @@ export class cvt_Forecast_DELFOR extends XmlConverterBase {
                 // RFF
 
                 if (vType) {
-                    this._RFF_KV('AEH', vType);
+                    this._RFF_KV_EDI('AEH', vType);
                 }
             } // end loop nDetails
 
@@ -502,7 +506,7 @@ export class cvt_Forecast_DELFOR extends XmlConverterBase {
 
                 // RFF
                 if (vType) {
-                    this._RFF_KV('AEH', vType);
+                    this._RFF_KV_EDI('AEH', vType);
                 }
 
             }// end loop nForecasts
@@ -538,8 +542,7 @@ export class cvt_Forecast_DELFOR extends XmlConverterBase {
             //let COM = this._initSegEdi('COM', 1);
             let sVal = sPhoneCountryCode + '-' + sPhoneAreaOrCityCode + '-' + sPhoneNumber;
             // trim twice
-            sVal = sVal.startsWith('-') ? sVal.substring(1) : sVal;
-            sVal = sVal.startsWith('-') ? sVal.substring(1) : sVal;
+            sVal =this._trim(sVal);
             let linesOfKey = oCTAGroup[sName]; // multiple lines
             let arr: [string, string] = [sVal, 'TE'];
             if (linesOfKey) {
@@ -584,8 +587,7 @@ export class cvt_Forecast_DELFOR extends XmlConverterBase {
             //let COM = this._initSegEdi('COM', 1);
             let sVal = sFaxCountryCode + '-' + sFaxAreaOrCityCode + '-' + sFaxNumber;
             // trim twice
-            sVal = sVal.startsWith('-') ? sVal.substring(1) : sVal;
-            sVal = sVal.startsWith('-') ? sVal.substring(1) : sVal;
+            sVal =this._trim(sVal);
             let linesOfKey = oCTAGroup[sName]; // multiple lines
             let arr: [string, string] = [sVal, 'FX'];
             if (linesOfKey) {

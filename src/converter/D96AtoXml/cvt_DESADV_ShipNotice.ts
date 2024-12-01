@@ -16,7 +16,7 @@ import { CUtilEDI } from "../../utils/cUtilEDIFACT";
 import { XMLBuilderImpl } from "xmlbuilder2/lib/builder";
 import { select, select1 } from 'xpath'
 import { TidyAddress, TidyContact, TidyItemDetailRetail, TidyItemID, TidyModification, TidyProduct } from "../xmlTidy/TidyCommon";
-import { TidyComponentConsumptionDetails, TidyPackaging, TidyShipControl, TidyShipNoticeHeader, TidyShipNoticeItem, TidyShipNoticeItemDetail, TidyShipNoticeItemRetail, TidyShipNoticePortion, TidyTermsOfDelivery, TidyTermsOfTransport } from "../xmlTidy/ShipNotice";
+import { TidyBatch, TidyComponentConsumptionDetails, TidyPackaging, TidyShipControl, TidyShipNoticeHeader, TidyShipNoticeItem, TidyShipNoticeItemDetail, TidyShipNoticeItemRetail, TidyShipNoticePortion, TidyTermsOfDelivery, TidyTermsOfTransport } from "../xmlTidy/ShipNotice";
 import { validateHeaderName } from "http";
 
 
@@ -142,7 +142,7 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
         tShipHeader.att('fulfillmentType', this._segVal(BGM, 104));
 
         // DTM
-        let DTMs = this._rsegs("DTM");
+        let DTMs = this._rSegs("DTM");
         DTMs = DTMs ?? [];
         for (let DTM of DTMs) {
             let vDTM101 = this._segVal(DTM, 101);
@@ -177,7 +177,7 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
 
 
         // MEA
-        let MEAs = this._rsegs("MEA");
+        let MEAs = this._rSegs("MEA");
         MEAs = MEAs ?? [];
         let tPackaging = new TidyPackaging();
         for (let MEA of MEAs) {
@@ -189,10 +189,13 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
             let vMEA201 = this._segVal(MEA, 201);
             let vMEA301 = this._segVal(MEA, 301);
             let vMEA302 = this._segVal(MEA, 302);
-
+            eDim.att(XML.quantity, vMEA302);
             eDim.att('type', this._mcs(MAPS.mapMEA6313, vMEA201));
             eDim.ele(XML.UnitOfMeasure).txt(vMEA301);
-            eDim.att(XML.quantity, vMEA302);
+
+        }
+        if (!tPackaging.isEmpty()) {
+            tPackaging.sendTo(tShipHeader.Packaging.ele('Packaging'));
         }
 
         // SG1 Group1
@@ -284,10 +287,14 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
 
         let eShipNoticeRequest = request.ele('ShipNoticeRequest');
         tTOD.sendTo(tShipHeader.TermsOfDelivery.ele('TermsOfDelivery'));
-        tTOT.sendTo(tShipHeader.TermsOfTransport.ele('TermsOfTransport'));
+        if (!tTOT.isEmpty()) {
+            tTOT.sendTo(tShipHeader.TermsOfTransport.ele('TermsOfTransport'));
+        }
 
         tShipHeader.sendTo(eShipNoticeRequest.ele('ShipNoticeHeader'));
-        tControl.sendTo(eShipNoticeRequest.ele('ShipControl'));
+        if (!tControl.isEmpty()) {
+            tControl.sendTo(eShipNoticeRequest.ele('ShipControl'));
+        }
 
         for (let k in this._mapPortion) {
             let tPortioin = this._mapPortion[k];
@@ -389,12 +396,12 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
         let IMDs = this._dSegs(SG15, 'IMD');
         IMDs = IMDs ?? [];
         let sShortName = '';
-        let sShortNameLang = 'EN';
+        let sShortNameLang = 'en';
         let sDescription = '';
-        let sDescriptionLang = 'EN';
+        let sDescriptionLang = 'en';
         for (let IMD of IMDs) {
             let vIMD1 = this._segVal(IMD, 1);
-            let vIMD201 = this._segVal(IMD, 201);
+            let vIMD2 = this._segVal(IMD, 2);
             let vIMD301 = this._segVal(IMD, 301);
             let vIMD304 = this._segVal(IMD, 304);
             let vIMD305 = this._segVal(IMD, 305);
@@ -402,16 +409,16 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
             switch (vIMD1) {
                 case 'E':
                     sShortName = sShortName + vIMD301 + vIMD304 + vIMD305;
-                    sShortNameLang = vIMD306 ? vIMD306 : 'EN';
+                    sShortNameLang = vIMD306 ? vIMD306 : 'en';
                     break;
                 case 'F':
                     sDescription = sDescription + vIMD304 + vIMD305;
-                    sDescriptionLang = vIMD306 ? vIMD306 : 'EN';
+                    sDescriptionLang = vIMD306 ? vIMD306 : 'en';
                     break;
                 case 'B':
                     if (!vIMD301) {
                         let eChar = tDetailRetail.Characteristic.ele('Characteristic')
-                        eChar.att(XML.domain, this._mcs(MAPS.mapIMD7081, vIMD201));
+                        eChar.att(XML.domain, this._mcs(MAPS.mapIMD7081, vIMD2));
                         eChar.att('value', vIMD304);
                     } else if (vIMD301 == 'ACA') {
                         if (vIMD304) {
@@ -428,8 +435,12 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
         } // end loop IMDs
 
         // output concatenated string
-        tItemDetail.Description.ele(XML.Description).txt(sDescription).att(XML.lang, sDescriptionLang)
-            .ele('ShortName').txt(sShortName);
+        if (sDescription || sShortName) {
+            let eDesc = tItemDetail.Description.ele(XML.Description).txt(sDescription).att(XML.lang, sDescriptionLang);
+            if (sShortName) {
+                eDesc.ele('ShortName').txt(sShortName);
+            }
+        }
 
         // MEA
         let MEAs = this._dSegs(SG15, 'MEA');
@@ -457,9 +468,19 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
             renderObjID = shipPack.sParentID;
         }
         arrRenderIDs = arrRenderIDs.reverse(); // we need to render with Order: Pallet, Box, Carton
+        let lastParentID: string;
         for (let shipID of arrRenderIDs) {
             let shipPack = ShipPackaging.gMap[shipID];
+            shipPack.tPackaging.Description.ele(XML.Description).att(XML.type, 'Packaging').att(XML.lang, 'en-US');
+            if (lastParentID) {
+                let nSerialCode = this._chd(ShipPackaging.gMap[lastParentID].tPackaging.ShippingContainerSerialCode, 'ShippingContainerSerialCode');
+                // shipPack.tPackaging.ShippingContainerSerialCodeReference.ele('ShippingContainerSerialCodeReference')
+                // .txt(ShipPackaging.gMap[lastParentID].tPackaging.ShippingContainerSerialCode);
+                1 + 1;
+
+            }
             shipPack.tPackaging.sendTo(tItem.Packaging.ele('Packaging'));
+            lastParentID = shipID;
         }
 
         // Item Level Packaging
@@ -470,31 +491,24 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
             let vQTY101 = this._segVal(QTY, 101);
             let vQTY102 = this._segVal(QTY, 102);
             let vQTY103 = this._segVal(QTY, 103);
+            vQTY103 = vQTY103 ? vQTY103 : 'EA';
             switch (vQTY101) {
                 case '12':
                     tItem.att(XML.quantity, vQTY102).UnitOfMeasure.ele(XML.UnitOfMeasure)
                         .txt(vQTY103);
-                    tPackaging.DispatchQuantity.ele('DispatchQuantity').att(XML.quantity, vQTY102)
-                        .ele(XML.UnitOfMeasure).txt(vQTY103);
+                    tItemDetail.UnitOfMeasure.ele(XML.UnitOfMeasure).txt(vQTY103);
                     break;
                 case '21':
                     let eQuantity = tItem.OrderedQuantity.ele('OrderedQuantity');
                     eQuantity.att('quantity', vQTY102);
-                    if (vQTY103) {
-                        eQuantity.ele(XML.UnitOfMeasure).txt(vQTY103);
-                    } else {
-                        eQuantity.ele(XML.UnitOfMeasure).txt('EA');
-                    }
+                    eQuantity.ele(XML.UnitOfMeasure).txt(vQTY103);
+
                     break;
                 case '192':
-
                     let eQuan192 = tItemRetail.FreeGoodsQuantity.ele('FreeGoodsQuantity');
                     eQuan192.att('quantity', vQTY102);
-                    if (vQTY103) {
-                        eQuan192.ele(XML.UnitOfMeasure).txt(vQTY103);
-                    } else {
-                        eQuan192.ele(XML.UnitOfMeasure).txt('EA');
-                    }
+                    eQuan192.ele(XML.UnitOfMeasure).txt(vQTY103);
+
                     break;
             } // end switch vQTY101
         } // end loop QTYs
@@ -517,7 +531,7 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
             switch (vGIR202) {
                 case 'AN':
                     tItemDetail.ManufacturerName.ele('ManufacturerName')
-                        .txt(vGIR201 + vGIR301 + vGIR401 + vGIR501 + vGIR601);
+                        .txt([vGIR201, vGIR301, vGIR401, vGIR501, vGIR601].join(' ').trim());
                     break;
                 case 'AP':
                     tItem.AssetInfo.ele('AssetInfo').att('tagNumber', vGIR201);
@@ -567,18 +581,13 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
             let vFTX401 = this._segVal(FTX, 401);
             switch (vFTX1) {
                 case 'AAI':
-                    let sComments = this._segVal(FTX, 401)
-                        + this._segVal(FTX, 402)
-                        + this._segVal(FTX, 403)
-                        + this._segVal(FTX, 404);
-                    + this._segVal(FTX, 405);
-                    let sLang = this._segVal(FTX, 5);
-                    tItem.Comments.ele('Comments').txt(sComments)
-                        .att(XML.lang, sLang);
+                    tItem.Comments.ele('Comments').att(XML.lang, this._segVal(FTX, 5)).att('type', this._segVal(FTX, 401))
+                        .txt(this._segVal(FTX, 402) + this._segVal(FTX, 403) + this._segVal(FTX, 404) + this._segVal(FTX, 405));
+
                     break;
                 case 'ZZZ':
                     let sName = vFTX401;
-                    let sValue = this._segVal(FTX, 402) + this._segVal(FTX, 403) + this._segVal(FTX, 404) + this._segVal(FTX, 405);
+                    let sValue = [this._segVal(FTX, 402), this._segVal(FTX, 403), this._segVal(FTX, 404), this._segVal(FTX, 405)].join('').trim();
                     tItem.Extrinsic.ele('Extrinsic').att('name', sName).txt(sValue);
                     break;
 
@@ -605,7 +614,7 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
         for (let SG20 of SG20s) {
             this._SG10_SG15_SG20_PCI10(SG20, tItem);
             this._SG10_SG15_SG20_PCI4(SG20, tItem);
-            this._SG10_SG15_SG20_PCI2430(SG20, tItem, tPackaging);
+            this._SG10_SG15_SG20_PCI2430(SG20, tItem, lastParentID);
         }
 
         // SG23
@@ -620,12 +629,12 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
                     .txt(this._segVal(QVR, 2));
             }
         }
-
-        // render the Item level Packaging
-        // tPackaging.sendTo(tItem.Packaging.ele('Packaging'));
-
-        tItemRetail.sendTo(tItem.ShipNoticeItemIndustry.ele('ShipNoticeItemIndustry').ele('ShipNoticeItemRetail'));
+        if (!tItemRetail.isEmpty()) {
+            tItemRetail.sendTo(tItem.ShipNoticeItemIndustry.ele('ShipNoticeItemIndustry').ele('ShipNoticeItemRetail'));
+        }
         if (!tItemID.isEmpty()) {
+            // to fulfill the DTD in case there is no SupplierPartID yet. create an empty one.
+            this._ele2(tItemID.SupplierPartID, 'SupplierPartID');
             tItemID.sendTo(tItem.ItemID.ele('ItemID'));
         }
 
@@ -647,7 +656,7 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
      * @param tItem 
      * @returns 
      */
-    private _SG10_SG15_SG20_PCI2430(SG20: ASTNode, tItem: TidyShipNoticeItem, tTemplatePackaging: TidyPackaging) {
+    private _SG10_SG15_SG20_PCI2430(SG20: ASTNode, tItem: TidyShipNoticeItem, lastParentID: string) {
         // Every SG20 needs to generate one <Packaging>
         let tPackaging = new TidyPackaging();
         // PCI
@@ -656,12 +665,15 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
         if (vPCI1 != '24' && vPCI1 != '30') {
             return;
         }
-
-        let sMark = '';
+        //let sMark = '';
         for (let i = 1; i <= 10; i++) {
-            sMark += this._segVal(PCI, 200 + i);
+            let sMark = this._segVal(PCI, 200 + i);
+            if (sMark) {
+                tPackaging.ShippingMark.ele('ShippingMark').txt(sMark);
+            }
+            //sMark += this._segVal(PCI, 200 + i);
         }
-        tPackaging.ShippingMark.ele('ShippingMark').txt(sMark);
+
 
         // DTM
         let DTMs = this._dSegs(SG20, 'DTM');
@@ -720,6 +732,15 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
                         let vI02 = this._segVal(GIN, i * 100 + 2);
                         sSerialCode += (vI01 + vI02);
                     }
+
+                    tPackaging.Description.ele(XML.Description).att(XML.type, 'Material').att(XML.lang, 'en-US');
+                    if (lastParentID) {
+                        let nSerialCode = this._chd(ShipPackaging.gMap[lastParentID].tPackaging.ShippingContainerSerialCode, 'ShippingContainerSerialCode');
+                        // shipPack.tPackaging.ShippingContainerSerialCodeReference.ele('ShippingContainerSerialCodeReference')
+                        // .txt(ShipPackaging.gMap[lastParentID].tPackaging.ShippingContainerSerialCode);
+                        1 + 1;
+
+                    }
                     tPackaging.ShippingContainerSerialCode.ele('ShippingContainerSerialCode').txt(sSerialCode);
                     break;
 
@@ -731,6 +752,7 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
     } // end function _SG10_SG15_SG20_PCI2430
 
     private _SG10_SG15_SG20_PCI10(SG20: ASTNode, tItem: TidyShipNoticeItem) {
+        let tBatch = new TidyBatch();
         // PCI
         let PCI = this._dSeg1(SG20, 'PCI');
         if (this._segVal(PCI, 1) != '10') {
@@ -745,17 +767,17 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
             let vDTM103 = this._segVal(DTM, 103);
             switch (vDTM101) {
                 case '36':
-                    this._ele2(tItem.Batch, 'Batch').att('expirationDate',
+                    tBatch.att('expirationDate',
                         Utils.dateStrFromDTM2(vDTM102, vDTM103)
                     );
                     break;
                 case '94':
-                    this._ele2(tItem.Batch, 'Batch').att('productionDate',
+                    tBatch.att('productionDate',
                         Utils.dateStrFromDTM2(vDTM102, vDTM103)
                     );
                     break;
                 case '351':
-                    this._ele2(tItem.Batch, 'Batch').att('inspectionDate',
+                    tBatch.att('inspectionDate',
                         Utils.dateStrFromDTM2(vDTM102, vDTM103)
                     );
                     break;
@@ -766,7 +788,7 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
         let QTY = this._dSeg1(SG20, 'QTY');
         if (QTY) {
             if (this._segVal(QTY, 101) == '12') {
-                this._ele2(tItem.Batch, 'Batch').att('batchQuantity', this._segVal(QTY, 102));
+                tBatch.att('batchQuantity', this._segVal(QTY, 102));
             }
         }
 
@@ -778,13 +800,14 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
             for (let i = 2; i <= 3; i++) {
                 let vI01 = this._segVal(GIN, i * 100 + 1);
                 let vI02 = this._segVal(GIN, i * 100 + 2);
-                if (vI02 == '91') {
-                    this._ele3(tItem.Batch, 'Batch', 'SupplierBatchID').txt(vI01);
+                if (!vI02 || vI02 == '91') {
+                    this._ele2(tBatch.SupplierBatchID, 'SupplierBatchID').txt(vI01);
                 } else if (vI02 == '92') {
-                    this._ele3(tItem.Batch, 'Batch', 'BuyerBatchID').txt(vI01);
+                    this._ele2(tBatch.BuyerBatchID, 'BuyerBatchID').txt(vI01);
                 }
             }
         } // end loop SG21s
+        tBatch.sendTo(tItem.Batch.ele('Batch'));
     } // end function _SG10_SG15_SG20_PCI10
 
     /**
@@ -803,8 +826,6 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
         let tConsumpD = new TidyComponentConsumptionDetails();
 
         tConsumpD.att('lineNumber', this._segVal(PCI, 201));
-        tConsumpD.att('type', this._segVal(PCI, 202)); // Can be "blocked" or "qualityRestricted" or "scrapped"
-        tConsumpD.att('usage', this._segVal(PCI, 203)); // Can be "yes" or "no"
 
         // QTY
         let QTY = this._dSeg1(SG20, 'QTY');
@@ -819,6 +840,9 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
                 }
             }
         } // end if QTY exist
+
+        tConsumpD.att('type', this._segVal(PCI, 202)); // Can be "blocked" or "qualityRestricted" or "scrapped"
+        tConsumpD.att('usage', this._segVal(PCI, 203)); // Can be "yes" or "no"
 
         // SG21 Group21
         let SG21s = this._dGrps(SG20, 'SG21');
@@ -932,9 +956,8 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
      * @param tShipHeader 
     */
     private _SG10B(SG10: ASTNode, tShipHeader: TidyShipNoticeHeader, tPackaging: TidyPackaging) {
-        // TODO: seems @type needs to be decided later
-        tPackaging.Description.ele(XML.Description).att(XML.lang, 'en-US')
-            .att('type', 'TODO');
+        // Description/@type may be done outside under root
+
         // SG10 SG11
         let SG11 = this._dGrp1(SG10, 'SG11');
         if (SG11) {
@@ -942,11 +965,12 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
             let vPAC301 = this._segVal(PAC, 301);
             let vPAC304 = this._segVal(PAC, 304);
 
+
             if (vPAC304) {
-                tPackaging.PackagingCode.ele('PackagingCode').txt(this._mcs(MAPS.mapPAC7065, vPAC304));
-                tPackaging.PackagingCode.ele('PackageTypeCodeIdentifierCode').txt(vPAC304);
+                tPackaging.PackagingCode.ele('PackagingCode').txt(vPAC304).att(XML.lang, 'en');
+                //tPackaging.PackagingCode.ele('PackageTypeCodeIdentifierCode').txt(vPAC301);
             } else {
-                tPackaging.PackagingCode.ele('PackagingCode').txt(this._mcs(MAPS.mapPAC7065, vPAC301));
+                tPackaging.PackagingCode.ele('PackagingCode').txt(this._mcs(MAPS.mapPAC7065, vPAC301)).att(XML.lang, 'en');
                 tPackaging.PackagingCode.ele('PackageTypeCodeIdentifierCode').txt(vPAC301);
             }
 
@@ -959,8 +983,8 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
                 let vMEA301 = this._segVal(MEA, 301);
                 let vMEA302 = this._segVal(MEA, 302);
                 if (vMEA1 == 'AAE') {
-                    tPackaging.Dimension.ele('Dimension').att('type', this._mcs(MAPS.mapMEA6313, vMEA201))
-                        .att(XML.quantity, vMEA302)
+                    tPackaging.Dimension.ele('Dimension').att(XML.quantity, vMEA302).att('type', this._mcs(MAPS.mapMEA6313, vMEA201))
+
                         .ele(XML.UnitOfMeasure).txt(vMEA301);
                 } // end if vMEA == 'AAE'
             }
@@ -973,7 +997,7 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
             }
 
             // SG11 SG13 Group13
-            let SG13s = this._rGrps('SG13');
+            let SG13s = this._dGrps(SG11, 'SG13');
             SG13s = SG13s ?? [];
             for (let SG13 of SG13s) {
                 let PCI = this._dSeg1(SG13, 'PCI');
@@ -983,10 +1007,12 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
                 let GIN = this._dSeg1(SG13, 'GIN');
 
                 if (vPCI1 == '30') {
-                    tPackaging.ShippingMark.ele('ShippingMark')
-                        .txt(this._segVal(PCI, 201) + this._segVal(PCI, 202) + this._segVal(PCI, 203)
-                            + this._segVal(PCI, 204) + this._segVal(PCI, 205) + this._segVal(PCI, 206) + this._segVal(PCI, 207)
-                            + this._segVal(PCI, 208) + this._segVal(PCI, 209) + this._segVal(PCI, 210))
+                    for (let i = 1; i <= 10; i++) {
+                        let v = this._segVal(PCI, 2 * 100 + i);
+                        if (v) {
+                            tPackaging.ShippingMark.ele('ShippingMark').txt(v);
+                        }
+                    }
                     let vGIN1 = this._segVal(GIN, 1);
                     if (vGIN1 == 'BJ' || vGIN1 == 'AW') {
                         let s = '';
@@ -1025,12 +1051,12 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
                     .att(XML.lang, this._segVal(FTX, 5));
             } else if (vFTX1 == 'ZZZ') {
                 tShipHeader.Extrinsic.ele('Extrinsic').att('name', this._segVal(FTX, 401))
-                    .txt(this._segVal(FTX, 402) + this._segVal(FTX, 403) + this._segVal(FTX, 404) + this._segVal(FTX, 405));
+                    .txt([this._segVal(FTX, 402), this._segVal(FTX, 403), this._segVal(FTX, 404), this._segVal(FTX, 405)].join(' ').trim());
             }
         }
 
         // SG11 Group11
-        let SG11s = this._rGrps('SG11');
+        let SG11s = this._dGrps(SG10, 'SG11');
         SG11s = SG11s ?? [];
         for (let SG11 of SG11s) {
             this._SG10_SG11A(SG11, tShipHeader);
@@ -1153,28 +1179,35 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
         let vTOD301 = this._segVal(TOD, 301);
         let vTOD304 = this._segVal(TOD, 304);
         let vTOD305 = this._segVal(TOD, 305);
+        // [Can be overwritten, refer to FTX+AAR+TDC]
         tTOD.TermsOfDeliveryCode.ele('TermsOfDeliveryCode').att(
             'value', this._mcs(MAPS.mapTOD4055, vTOD1)
         );
-        tTOD.ShippingPaymentMethod.ele('ShippingPaymentMethod').att(
-            'value', this._mcs(MAPS.mapTOD4215, vTOD2)
-        );
-        tTOD.TransportTerms.ele('TransportTerms').att(
-            'value', this._mcs(MAPS.mapTOD4053, vTOD301)
-        )
-        switch (vTOD1) {
-            case '6':
-                tTOD.Comments.ele('Comments').att(XML.lang, 'EN').att('type', 'TermsOfDelivery')
-                    .txt(vTOD304 + vTOD305);
-                break;
-            case '5':
-                tTOD.Comments.ele('Comments').att(XML.lang, 'EN').att('type', 'Transport')
-                    .txt(vTOD304 + vTOD305);
-                break;
-            default:
-            // do not map
-        } // end switch vTOD1
-
+        if (vTOD2 != 'ZZZ') {
+            tTOD.ShippingPaymentMethod.ele('ShippingPaymentMethod').att(
+                'value', this._mcs(MAPS.mapTOD4215, vTOD2)
+            );
+        }
+        if (vTOD301 != 'ZZZ') {
+            tTOD.TransportTerms.ele('TransportTerms').att(
+                'value', this._mcs(MAPS.mapTOD4053, vTOD301)
+            )
+        }
+        let vCmt = vTOD304 + vTOD305;
+        if (vCmt) {
+            switch (vTOD1) {
+                case '6':
+                    tTOD.Comments.ele('Comments').att(XML.lang, 'en').att('type', 'TermsOfDelivery')
+                        .txt(vTOD304 + vTOD305);
+                    break;
+                case '5':
+                    tTOD.Comments.ele('Comments').att(XML.lang, 'en').att('type', 'Transport')
+                        .txt(vTOD304 + vTOD305);
+                    break;
+                default:
+                // do not map
+            } // end switch vTOD1
+        }
         // FTX
         let FTXs = this._dSegs(SG5, 'FTX');
         FTXs = FTXs ?? [];
@@ -1185,12 +1218,12 @@ export class Cvt_DESADV_ShipNotice extends ConverterBase {
             switch (vFTX1) {
                 case 'AAR':
                     if (vFTX301 == 'TDC') {
-                        this._ele2(tTOD.TermsOfDeliveryCode, 'TermsOfDeliveryCode').att('value', 'Other')
+                        this._ele2(tTOD.TermsOfDeliveryCode, 'TermsOfDeliveryCode').att('value', 'other')
                             .txt(vFTX401);
-                    } else if (vFTX301 == 'SPM') {
+                    } else if (vTOD2 == 'ZZZ' && vFTX301 == 'SPM') {
                         this._ele2(tTOD.ShippingPaymentMethod, 'ShippingPaymentMethod').att('value', 'Other')
                             .txt(vFTX401);
-                    } else if (vFTX301 == 'TTC') {
+                    } else if (vTOD301 == 'ZZZ' && vFTX301 == 'TTC') {
                         this._ele2(tTOD.TransportTerms, 'TransportTerms').att('value', 'Other')
                             .txt(vFTX401);
                     }

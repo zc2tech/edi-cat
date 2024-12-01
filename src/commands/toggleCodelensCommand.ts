@@ -7,7 +7,7 @@ export class ToggleCodelensCommand {
     if (!vscode.window.activeTextEditor) {
       return;
     }
-    let conf = vscode.workspace.getConfiguration(constants.configuration.ediTsuya);
+    let conf = vscode.workspace.getConfiguration(constants.configuration.ediCat);
     let isEnabled = conf.get(constants.configuration.enableCodelens);
 
     // The arguments are:

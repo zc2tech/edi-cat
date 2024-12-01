@@ -23,7 +23,7 @@ export abstract class XmlConverterBase {
     protected _dom: Document;
     protected _segs: EdiSegment[];
     protected _sUniqueRefIC: string = '00000002635745';
-    protected _sUniqueRefGP: string = '0001';
+    protected _sUniqueRefGP: string = '1';
     protected _ISA_ControlNumber = '123456789';
     protected _GS_ControlNumber = '987654321';
     protected _ST_ControlNumber = '7777';
@@ -32,6 +32,112 @@ export abstract class XmlConverterBase {
         this._convertErrs.push(CUtilX12.err);
     }
 
+    /**
+ * Oppresse exception for idx outbound
+ * @param arr 
+ * @param idx 
+ */
+    protected _arrVal(arr: string[], idx: number): string {
+        try {
+            return arr[idx];
+        } catch (error) {
+            return '';
+        }
+    }
+    /**
+  * reverse sign
+  * @param sAmount 
+  */
+    protected _reverseSign(sAmount: string): string {
+        if (!sAmount) {
+            return '';
+        }
+        let num;
+        try {
+            num = parseFloat(sAmount);
+        } catch (error) {
+            return '';
+        }
+
+        return (num * (-1.0)).toString();
+
+    }
+
+    /**
+     * Currently, just trim ' ' and '-',
+     * will add when needed
+     * @param str 
+     */
+    protected _trim(str:string) {
+        const regex = /^[ \-]+|[ \-]+$/g;
+        return str.replace(regex, '');
+    }
+    /**
+      * always return negtive number
+      * @param sAmount 
+      * 
+      */
+
+    protected _negSign(sAmount: string): string {
+        if (!sAmount) {
+            return '';
+        }
+        if (!sAmount.startsWith('-')) {
+            return this._reverseSign(sAmount);
+        } else {
+            // already negtive
+            return sAmount;
+        }
+    }
+
+    /**
+      * always return positive number
+      * @param sAmount 
+      * 
+      */
+
+    protected _posSign(sAmount: string): string {
+        if (!sAmount) {
+            return '';
+        }
+        if (sAmount.startsWith('-')) {
+            return this._reverseSign(sAmount);
+        } else {
+            // already negtive
+            return sAmount;
+        }
+    }
+
+    /**
+     * Multiple by 100.0
+     * @param sNum 
+     */
+    protected _x100(sNum: string): string {
+        if (!sNum) {
+            return sNum;
+        }
+        try {
+            // return (parseFloat(sNum) * 100.0).toPrecision(3);
+            return (parseFloat(sNum) * 100.0).toString();
+        } catch (error) {
+            return sNum;
+        }
+    }
+
+    /**
+     * Divided by 100.0
+     * @param sNum 
+     */
+    protected _d100(sNum: string) {
+        if (!sNum) {
+            return sNum;
+        }
+        try {
+            return (parseFloat(sNum) / 100.0).toPrecision(3);
+        } catch (error) {
+            return sNum;
+        }
+    }
 
     protected _init(vsdoc: vscode.TextDocument) {
         this._dom = new DOMParser().parseFromString(vsdoc.getText(), 'text/xml');
@@ -39,15 +145,102 @@ export abstract class XmlConverterBase {
         Utils.sDefaultTMZ = '';
     }
     /**
-   * 
+   * for EDIFACT
    * @param key position in RFF must be 101
    * @param value 
    */
-    protected _RFF_KV(key: string, value: string) {
+    protected _RFF_KV_EDI(key: string, value: string) {
         if (value) {
             let RFF = this._initSegEdi('RFF', 1);
             this._setV(RFF, 101, key);
             this._setV(RFF, 102, value);
+        }
+    }
+
+    /**
+   * for X12, Double Elements
+   * @param key position in RFF must be 1
+   * @param value 
+   */
+    protected _REF_KV_X12D(key: string, value: string) {
+        if (value) {
+            let REF = this._initSegX12('REF', 2);
+            this._setV(REF, 1, key);
+            this._setV(REF, 2, value);
+        }
+    }
+
+    /**
+   * for X12, Double Elements
+   * @param key position in RFF must be 1
+   * @param value 
+   */
+    protected _MAN_KV_X12D(key: string, value: string) {
+        if (value) {
+            let MAN = this._initSegX12('MAN', 2);
+            this._setV(MAN, 1, key);
+            this._setV(MAN, 2, value);
+        }
+    }
+    /**
+   * for X12, Tripple Elements
+   * @param key position in RFF must be 1
+   * @param value 
+   */
+    protected _MAN_KV_X12T(v01: string, v02: string,v03:string) {
+        if (v02|| v03) {
+            let MAN = this._initSegX12('MAN', 3);
+            this._setV(MAN, 1, v01);
+            this._setV(MAN, 2, v02);
+            this._setV(MAN, 3, v03);
+        }
+    }
+
+    /**
+   * for X12, Triple Elements
+   * @param v01 position in RFF must be 1
+   * @param v02 
+   */
+    protected _REF_KV_X12T(v01: string, v02: string, v03: string) {
+        // if you want to create segment when only v02 has value
+        // Please create a new function, this function is only for v03
+        if (v03) {
+            let REF = this._initSegX12('REF', 3);
+            this._setV(REF, 1, v01);
+            this._setV(REF, 2, v02);
+            this._setV(REF, 3, v03);
+        }
+    }
+
+    /**
+    * for X12, Date will be converted to 304 CCYYMMDDHHMMSS[timezone]
+    * format and then set to REF
+    * 
+    * @param v01 position in RFF must be 1
+    * @param v02 
+    * @param vDate the format is XML format
+    */
+    protected _REF_Date_X12(v01: string, v02: string, vDate: string) {
+        if (vDate) {
+            let vConvertedDate = Utils.dateStr304TZ(vDate);
+            let RFF = this._initSegX12('REF', 4);
+            this._setV(RFF, 1, v01);
+            this._setV(RFF, 2, v02);
+            this._setV(RFF, 3, vConvertedDate);
+        }
+    }
+
+    /**
+   * for X12
+   * @param key position in RFF must be 1
+   * @param value 
+   */
+    protected _AMT_X12(nElement: Element, sRelXpath: string, v1: string) {
+        let value = this._v(sRelXpath, nElement);
+        if (value) {
+            let AMT = this._initSegX12('AMT', 2);
+            this._setV(AMT, 1, v1);
+            this._setV(AMT, 2, value);
         }
     }
 
@@ -63,21 +256,30 @@ export abstract class XmlConverterBase {
         if (sDate) {
             let DTM = this._initSegEdi('DTM', 1);
             this._setV(DTM, 101, s101);
-            this._setV(DTM, 102, Utils.dateStr304TZ(sDate, 'GM'));
+            this._setV(DTM, 102, Utils.dateStr304TZ(sDate));
             this._setV(DTM, 103, '304');
         }
     }
 
     /**
-     * Always use 'GM' timezone
-     * Only for 304 qualifier DTM
+     * 
      * @param nElement 
      * @param sRelXpath 
      * @param s101 
      */
     protected _DTM_X12(nElement: Element, sRelXpath: string, s1: string) {
+        this._DTM_X12A(this._v(sRelXpath, nElement), s1);
+    }
+
+    /**
+     * 1) convert from string, not xpath
+     * 
+     * @param sDate the Date String "yyyy-MM-dd'T'HH:mm:ssxxx" or "yyyy-MM-dd'T'HH:mmxxx"
+     * @param s1 value for DTM01
+     */
+    protected _DTM_X12A(sDate: string, s1: string) {
         let dDTM: Date;
-        dDTM = Utils.parseToDateSTD2(this._v(sRelXpath, nElement));
+        dDTM = Utils.parseToDateSTD2(sDate);
         if (dDTM) {
             let DTM = this._initSegX12('DTM', 4);
             this._setV(DTM, 1, s1);
@@ -123,7 +325,7 @@ export abstract class XmlConverterBase {
         let d: Date = new Date();
         let sYYMMDD = Utils.getYYMMDD(d);
         let sHHMM = Utils.getHHMM(d);
-        let conf = vscode.workspace.getConfiguration(configuration.ediTsuya);
+        let conf = vscode.workspace.getConfiguration(configuration.ediCat);
         let buyerIC: string = conf.get(configuration.buyerIC);
         let supplierIC: string = conf.get(configuration.supplierIC);
         let sICFrom: string;
@@ -168,7 +370,7 @@ export abstract class XmlConverterBase {
      * @param sFuncId 
      */
     protected _GS(bOutbound: boolean, sFuncId: string) {
-        let conf = vscode.workspace.getConfiguration(configuration.ediTsuya);
+        let conf = vscode.workspace.getConfiguration(configuration.ediCat);
         let buyerIC: string = conf.get(configuration.buyerIC);
         let buyerGP: string = conf.get(configuration.buyerGP);
         let supplierIC: string = conf.get(configuration.supplierIC);
@@ -223,7 +425,7 @@ export abstract class XmlConverterBase {
      * @param bReq Request or Message
      */
     protected _UNB(s0026: string, bReq: boolean) {
-        let conf = vscode.workspace.getConfiguration(configuration.ediTsuya);
+        let conf = vscode.workspace.getConfiguration(configuration.ediCat);
         let buyerIC: string = conf.get(configuration.buyerIC);
         let buyerGP: string = conf.get(configuration.buyerGP);
         let supplierIC: string = conf.get(configuration.supplierIC);
@@ -367,7 +569,7 @@ export abstract class XmlConverterBase {
         tmp.elements = [];
         for (let i = 0; i < eleCount; i++) {
             let tmpEle = new EdiElement;
-            this._initComponents(tmpEle, maxCompPerEle);
+            this._initCompX12(tmpEle, maxCompPerEle);
             tmpEle.value = '';
             // if (name !== 'UNA') {
             //     tmpEle.delimiter = "+";
@@ -381,7 +583,7 @@ export abstract class XmlConverterBase {
     }
 
     /**
-     * 
+     * This is for EDIFACT, so the delimiter is ':'
      * @param seg 
      * @param eleIdx always based on 1
      * @param compCount 
@@ -391,6 +593,21 @@ export abstract class XmlConverterBase {
         for (let i = 0; i < compCount; i++) {
             let tmpComp = new EdiElement();
             tmpComp.delimiter = ':';
+            tmpComp.value = '';
+            ele.components.push(tmpComp);
+        }
+    }
+    /**
+     * This is for X12, so the delimiter is '^'
+     * @param seg 
+     * @param eleIdx always based on 1
+     * @param compCount 
+     */
+    private _initCompX12(ele: EdiElement, compCount: number) {
+        ele.components = [];
+        for (let i = 0; i < compCount; i++) {
+            let tmpComp = new EdiElement();
+            tmpComp.delimiter = '^';
             tmpComp.value = '';
             ele.components.push(tmpComp);
         }
@@ -422,6 +639,9 @@ export abstract class XmlConverterBase {
     protected _setV(seg: EdiSegment, idx: number, val: string) {
         let eleIdx: number;
         let compIdx: number;
+        if (!val) {
+            return;
+        }
         if (idx >= 100) {
             // it contains component id
             eleIdx = Math.floor(idx / 100);
@@ -453,6 +673,9 @@ export abstract class XmlConverterBase {
     protected _setTV(seg: EdiSegment, idx: number, val: string) {
         let eleIdx: number;
         let compIdx: number;
+        if (!val) {
+            return;
+        }
         if (idx >= 100) {
             // it contains component id
             eleIdx = Math.floor(idx / 100);
@@ -573,6 +796,7 @@ export abstract class XmlConverterBase {
 
     /**
      * Get Value under Parent Dom Node using strPath
+     * 
      * @param strPath 
      * @param p 
      * @returns 
@@ -622,6 +846,7 @@ export abstract class XmlConverterBase {
     }
 
     /**
+     * return Node type, are we using this function ?
      * 
      * @param strPath Relative xpath
      * @param p Parent Node
@@ -630,11 +855,13 @@ export abstract class XmlConverterBase {
     protected _n(strPath: string, p: Node): Node {
         return xpath.select1(this._rmLeadingSlash(strPath), p) as Node;
     }
+
     /**
+     * One Node under Parent Node
      * 
      * @param strPath Relative xpath
      * @param p Parent Node
-     * @returns Node
+     * @returns Element
      */
     protected _e(strPath: string, p: Node): Element {
         if (!p) {
@@ -664,6 +891,7 @@ export abstract class XmlConverterBase {
 
     /**
      * Concat values of nodes in same xpath
+     * 
      * @param strPath Relative xpath
      * @param p Parent Node
      * @returns Node
@@ -678,16 +906,22 @@ export abstract class XmlConverterBase {
     }
 
     /**
-     * Multiple Nodes, return Element[]
+     * Multiple Nodes under Parent Node
+     * 
      * @param strPath Relative xpath
      * @param p Parent Node
-     * @returns Node
+     * @returns Element[]
      */
     protected _es(strPath: string, p: Node): Element[] {
         if (!p) {
             return [];
         }
-        return xpath.select(this._rmLeadingSlash(strPath), p) as Element[];
+        let rtn = xpath.select(this._rmLeadingSlash(strPath), p) as Element[];
+        if (!rtn) {
+            return [];
+        } else {
+            return rtn;
+        }
     }
 
     /**
@@ -807,9 +1041,11 @@ export abstract class XmlConverterBase {
 
 
     /**
-     * We need to remove ShortName element inside
+     * We need to remove ShortName/Attachment element inside
+     * We found only Text Node and concatenate.
+     * the 't' in function name '_vt' means text
      */
-    protected _extractText(nRefDesc: Node) {
+    protected _vt(nRefDesc: Node) {
         if (!nRefDesc || !nRefDesc.childNodes) {
             return '';
         }
@@ -821,10 +1057,19 @@ export abstract class XmlConverterBase {
             }
         }
 
-        return sResult;
+        return sResult.trim();
+    }
+    /**
+     * Extract pure text, removing included element like <ShortName>
+     * 
+     */
+    protected _vt2(strPath: string, p: Node): string {
+        let nNode = this._e(strPath,p);
+        return this._vt(nNode);
     }
 
     /**
+     * For both X12 and EDIFACT
      * Split Long String into componets of EDISegment
      * 
      * @param SEG EdiSegement
@@ -835,35 +1080,72 @@ export abstract class XmlConverterBase {
      */
     protected _splitStr(SEG: EdiSegment, str: string, iEle: number
         , iStartComp: number, iEndComp: number, iLenPerComp: number) {
+        if (!str) {
+            return;
+        }
         let tmp = str;
-        for (let i = iStartComp; i <= iEndComp; i++) {
-            if (tmp.length > iLenPerComp) {
-                this._setV(SEG, iEle * 100 + i, EdiUtils.escapeEdi(tmp.substring(0, iLenPerComp)));
-                tmp = tmp.substring(iLenPerComp);
-            } else {
-                this._setV(SEG, iEle * 100 + i, EdiUtils.escapeEdi(tmp));
-                break;
+        // we use endingDelimiter to decide if it's X12 and EDIFACT
+        // Hope it will work
+        if (SEG.endingDelimiter == "'") {
+            // EDIFACT
+            for (let i = iStartComp; i <= iEndComp; i++) {
+                if (tmp.length > iLenPerComp) {
+                    this._setV(SEG, iEle * 100 + i, EdiUtils.escapeEdi(tmp.substring(0, iLenPerComp)));
+                    tmp = tmp.substring(iLenPerComp);
+                } else {
+                    this._setV(SEG, iEle * 100 + i, EdiUtils.escapeEdi(tmp));
+                    break;
+                }
+            }
+        } else {
+            // X12, endingDelimiter should be '~'
+            for (let i = iStartComp; i <= iEndComp; i++) {
+                if (tmp.length > iLenPerComp) {
+                    this._setV(SEG, iEle * 100 + i, tmp.substring(0, iLenPerComp));
+                    tmp = tmp.substring(iLenPerComp);
+                } else {
+                    this._setV(SEG, iEle * 100 + i, tmp);
+                    break;
+                }
             }
         }
     }
 
     /**
+     * Usually used for X12 as we don't care at Component Level
+     * 
+     * Very Simple version
      * For fields like N2,N3, split long string to Edisegment
-     * Always 2 parts in one segment!
      */
-    protected _splitStrX12(sLong: string, sSegName: string, iCntUnit: number) {
-        while (sLong) {
-            let theSeg = this._initSegX12(sSegName, 2);
-            this._setV(theSeg, 1, sLong.substring(0, iCntUnit));
-            sLong = sLong.substring(iCntUnit);
-            if (sLong) {
-                this._setV(theSeg, 2, sLong.substring(0, iCntUnit));
-            } else {
-                break;
-            }
-            sLong = sLong.substring(iCntUnit);
+    protected _splitStrSimple(sLong: string, sSegName: string, iCntUnit: number) {
+        sLong = sLong ? sLong.trim() : '';
+        if (!sLong) {
+            return;
         }
-
+        let idx: number = 1;
+        let iEleCount = 1 + (sLong.length - (sLong.length % iCntUnit)) / iCntUnit + 1
+        let theSeg = this._initSegX12(sSegName, iEleCount);
+        while (sLong) {
+            this._setV(theSeg, idx, sLong.substring(0, iCntUnit));
+            sLong = sLong.substring(iCntUnit);
+            idx++;
+        }
+    }
+    /**
+     * Fill different elements of one segment
+     * And always start from element 1 to fill
+     * 
+     */
+    protected _oneSegX12(eles: Element[], sSegName: string) {
+        if (!eles || eles.length <= 0) {
+            return;
+        }
+        let theSeg = this._initSegX12(sSegName, eles.length);
+        let i = 1;
+        for (let ele of eles) {
+            this._setV(theSeg, i, this._v('', ele));
+            i++;
+        }
     }
 
     /**

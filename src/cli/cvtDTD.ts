@@ -26,7 +26,7 @@ function getClassName(s:string):string {
 
 // Test the function.
 let str = `
-<!ELEMENT ItemDetailRetail (EANID?, EuropeanWasteCatalogID?, Characteristic* )>
+<!ELEMENT InvoiceDetailItemRetail (AdditionalPrices?, TotalRetailAmount?, ItemIndicator*, PromotionDealID?, PromotionVariantID?)>
 `
 const arrFields = getContents(str);
 const className = getClassName(str);

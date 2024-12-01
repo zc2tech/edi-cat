@@ -119,7 +119,12 @@ export abstract class DocInfoBase {
         "TE": "Telephone",
         "WWW": "WWW-Site (GS1 Code)"
     }
-
+    static CommuChannelQualifier3 = {
+        "AH": "URL",
+        "EM": "Electronic mail",
+        "FX": "Telefax",
+        "TE": "Telephone"
+    }
     static LanguageList = {
         "EN": "English",
         "ES": "Spanish",

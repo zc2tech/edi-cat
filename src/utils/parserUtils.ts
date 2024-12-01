@@ -36,6 +36,7 @@ import { Parser860 } from "../new_parser/x12/parser860";
 import { Parser861In } from "../new_parser/x12/parser861In";
 // import { Parser861Out } from "../new_parser/x12/parser861Out";
 import { Parser862 } from "../new_parser/x12/parser862";
+import { Parser865 } from "../new_parser/x12/parser865";
 import { Parser866 } from "../new_parser/x12/parser866";
 import { Parser997In } from "../new_parser/x12/parser997In";
 import { Parser997Out } from "../new_parser/x12/parser997Out";

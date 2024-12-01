@@ -53356,7 +53356,7 @@
           "Id": "373",
           "Desc": "Date",
           "DataType": "DT",
-          "Required": true,
+          "Required": false,
           "MinLength": 8,
           "MaxLength": 8,
           "Definition": "Date expressed as CCYYMMDD"
@@ -66179,7 +66179,7 @@
           "Desc": "Exchange Rate",
           "DataType": "R",
           "Required": false,
-          "MinLength": 2,
+          "MinLength": 1,
           "MaxLength": 10,
           "Definition": "Value to be used as a multiplier conversion factor to convert monetary value from one currency to another"
         },

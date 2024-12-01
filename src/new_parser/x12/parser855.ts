@@ -8,7 +8,7 @@ import { SyntaxParserBase, ASTNode, ASTNodeType, ASTOp, ASTOpType } from "../syn
 import { DocInfoBase } from "../../info/docInfoBase";
 import { Info_855 } from "../../info/info_855";
 import { ConvertPattern } from "../../cat_const";
-import { Cvt_855_OrderConfirm } from "../../converter/x12toXml/cvt855_OrderConfirm";
+import { Cvt_855_OrderConfirm } from "../../converter/x12toXml/cvt_855_OrderConfirm";
 
 /**
  * No need to make singleton because parserUtil already assured it
@@ -234,21 +234,12 @@ export class Parser855 extends SyntaxParserBase {
             "SAC": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"SAC"),
             "ACK": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"ACK"),
             "CUR": new ASTOp(ASTOpType.ADD_SIBLING_SEG),
-            "TXI": new ASTOp(ASTOpType.ADD_UNCLE_SEG),
-            "SCH": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"SCH"),
-            "N9": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"N9"),
-            "N1": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"N1"),
-            "CTT": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"CTT"),
         }
         dfa["ROOT_PO1_SAC_CUR"] = {
             "PO1": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"PO1"),
             "SAC": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"SAC"),
             "ACK": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"ACK"),
             "TXI": new ASTOp(ASTOpType.ADD_UNCLE_SEG),
-            "SCH": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"SCH"),
-            "N9": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"N9"),
-            "N1": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"N1"),
-            "CTT": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"CTT"),
         }
         dfa["ROOT_PO1_ACK_ACK"] = {
             "PO1": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"PO1"),
@@ -259,6 +250,7 @@ export class Parser855 extends SyntaxParserBase {
             "N9": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"N9"),
             "N1": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"N1"),
             "CTT": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"CTT"),
+            "SE": new ASTOp(ASTOpType.ADD_SEG_UNDER_ROOT),
         }
         dfa["ROOT_PO1_ACK_DTM"] = {
             "PO1": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"PO1"),
@@ -268,6 +260,7 @@ export class Parser855 extends SyntaxParserBase {
             "N9": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"N9"),
             "N1": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"N1"),
             "CTT": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"CTT"),
+            "SE": new ASTOp(ASTOpType.ADD_SEG_UNDER_ROOT),
         }
         dfa["ROOT_PO1_TXI"] = {
             "PO1": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"PO1"),
@@ -276,6 +269,7 @@ export class Parser855 extends SyntaxParserBase {
             "N9": new ASTOp(ASTOpType.NEW_SIBLING_GROUP,"N9"),
             "N1": new ASTOp(ASTOpType.NEW_SIBLING_GROUP,"N1"),
             "CTT": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"CTT"),
+            "SE": new ASTOp(ASTOpType.ADD_SEG_UNDER_ROOT),
         }
         dfa["ROOT_PO1_SCH_SCH"] = {
             "SCH": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"SCH"),
@@ -284,6 +278,7 @@ export class Parser855 extends SyntaxParserBase {
             "N9": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"N9"),
             "N1": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"N1"),
             "CTT": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"CTT"),
+            "SE": new ASTOp(ASTOpType.ADD_SEG_UNDER_ROOT),
         }
         dfa["ROOT_PO1_SCH_REF"] = {
             "SCH": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"SCH"),
@@ -292,6 +287,7 @@ export class Parser855 extends SyntaxParserBase {
             "N9": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"N9"),
             "N1": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"N1"),
             "CTT": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"CTT"),
+            "SE": new ASTOp(ASTOpType.ADD_SEG_UNDER_ROOT),
         }
         dfa["ROOT_PO1_N9_N9"] = {
             "PO1": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"PO1"),
@@ -299,6 +295,7 @@ export class Parser855 extends SyntaxParserBase {
             "MSG": new ASTOp(ASTOpType.ADD_SIBLING_SEG),
             "N1": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"N1"),
             "CTT": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"CTT"),
+            "SE": new ASTOp(ASTOpType.ADD_SEG_UNDER_ROOT),
         }
         dfa["ROOT_PO1_N9_MSG"] = {
             "PO1": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"PO1"),
@@ -306,6 +303,7 @@ export class Parser855 extends SyntaxParserBase {
             "MSG": new ASTOp(ASTOpType.ADD_SIBLING_SEG),
             "N1": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"N1"),
             "CTT": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"CTT"),
+            "SE": new ASTOp(ASTOpType.ADD_SEG_UNDER_ROOT),
         }
         dfa["ROOT_PO1_N1_N1"] = {
             "PO1": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"PO1"),
@@ -316,6 +314,7 @@ export class Parser855 extends SyntaxParserBase {
             "REF": new ASTOp(ASTOpType.ADD_SIBLING_SEG),
             "PER": new ASTOp(ASTOpType.ADD_SIBLING_SEG),
             "CTT": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"CTT"),
+            "SE": new ASTOp(ASTOpType.ADD_SEG_UNDER_ROOT),
         }
         dfa["ROOT_PO1_N1_N2"] = {
             "PO1": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"PO1"),
@@ -326,6 +325,7 @@ export class Parser855 extends SyntaxParserBase {
             "REF": new ASTOp(ASTOpType.ADD_SIBLING_SEG),
             "PER": new ASTOp(ASTOpType.ADD_SIBLING_SEG),
             "CTT": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"CTT"),
+            "SE": new ASTOp(ASTOpType.ADD_SEG_UNDER_ROOT),
         }
         dfa["ROOT_PO1_N1_N3"] = {
             "PO1": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"PO1"),
@@ -335,6 +335,7 @@ export class Parser855 extends SyntaxParserBase {
             "REF": new ASTOp(ASTOpType.ADD_SIBLING_SEG),
             "PER": new ASTOp(ASTOpType.ADD_SIBLING_SEG),
             "CTT": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"CTT"),
+            "SE": new ASTOp(ASTOpType.ADD_SEG_UNDER_ROOT),
         }
         dfa["ROOT_PO1_N1_N4"] = {
             "PO1": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"PO1"),
@@ -342,6 +343,7 @@ export class Parser855 extends SyntaxParserBase {
             "REF": new ASTOp(ASTOpType.ADD_SIBLING_SEG),
             "PER": new ASTOp(ASTOpType.ADD_SIBLING_SEG),
             "CTT": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"CTT"),
+            "SE": new ASTOp(ASTOpType.ADD_SEG_UNDER_ROOT),
         }
         dfa["ROOT_PO1_N1_REF"] = {
             "PO1": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"PO1"),
@@ -349,12 +351,14 @@ export class Parser855 extends SyntaxParserBase {
             "REF": new ASTOp(ASTOpType.ADD_SIBLING_SEG),
             "PER": new ASTOp(ASTOpType.ADD_SIBLING_SEG),
             "CTT": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"CTT"),
+            "SE": new ASTOp(ASTOpType.ADD_SEG_UNDER_ROOT),
         }
         dfa["ROOT_PO1_N1_PER"] = {
             "PO1": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"PO1"),
             "N1": new ASTOp(ASTOpType.NEW_UNCLE_GROUP,"N1"),
             "PER": new ASTOp(ASTOpType.ADD_SIBLING_SEG),
             "CTT": new ASTOp(ASTOpType.NEW_ROOT_GROUP,"CTT"),
+            "SE": new ASTOp(ASTOpType.ADD_SEG_UNDER_ROOT),
         }
         dfa["ROOT_CTT_CTT"] = {
             "AMT": new ASTOp(ASTOpType.ADD_SIBLING_SEG),

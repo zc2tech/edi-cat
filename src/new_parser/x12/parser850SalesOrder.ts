@@ -8,7 +8,7 @@ import { SyntaxParserBase, ASTNode, ASTNodeType, ASTOp, ASTOpType } from "../syn
 import { DocInfoBase } from "../../info/docInfoBase";
 import { Info_850_SalesOrder } from "../../info/inf0_850_SalesOrder";
 import { ConvertPattern } from "../../cat_const";
-import { Cvt850SalesOrder } from "../../converter/x12toXml/cvt850SalesOrder";
+import { Cvt_850_SalesOrder } from "../../converter/x12toXml/cvt_850_SalesOrder";
 
 /**
  * No need to make singleton because parserUtil already assured it
@@ -307,7 +307,7 @@ export class Parser850SalesOrder extends SyntaxParserBase {
 
     }
     public convert(pattern: ConvertPattern): string {
-        let cvt = new Cvt850SalesOrder(this._astTree);
+        let cvt = new Cvt_850_SalesOrder(this._astTree);
         switch (pattern) {
             case ConvertPattern.X12_to_cXML:
                 return cvt.toXML();

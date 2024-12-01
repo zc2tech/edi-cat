@@ -59,7 +59,32 @@ export class TidyInvoiceDetailItemReference extends TidyBase {
         p.import(this.ManufacturerPartID); p.import(this.ManufacturerName);
         p.import(this.Country); p.import(this.SerialNumber); p.import(this.SupplierBatchID); p.import(this.InvoiceDetailItemReferenceIndustry);
     }
+    public isEmpty(): boolean {
+        return !this.ItemID.some(() => true)
+            && !this.Description.some(() => true)
+            && !this.Classification.some(() => true)
+            && !this.ManufacturerPartID.some(() => true)
+            && !this.ManufacturerName.some(() => true)
+            && !this.Country.some(() => true)
+            && !this.SerialNumber.some(() => true)
+            && !this.SupplierBatchID.some(() => true)
+            && !this.InvoiceDetailItemReferenceIndustry.some(() => true)
+    }
 }
+
+// <!ELEMENT InvoiceDetailLineShipping (InvoiceDetailShipping, Money, Distribution*)>
+export class TidyInvoiceDetailLineShipping extends TidyBase {
+    InvoiceDetailShipping = fragment(); Money = fragment(); Distribution = fragment();
+    protected _subSend(p: XMLBuilder) {
+        p.import(this.InvoiceDetailShipping); p.import(this.Money); p.import(this.Distribution);
+    }
+    public isEmpty(): boolean {
+        return !this.InvoiceDetailShipping.some(() => true)
+            && !this.Money.some(() => true)
+            && !this.Distribution.some(() => true)         
+    }
+}
+
 
 // <!ELEMENT InvoiceDetailServiceItem (
 //     InvoiceDetailServiceItemReference,
@@ -163,6 +188,63 @@ export class TidyInvoiceDetailOrder extends TidyBase {
     }
 }
 
+// <!ELEMENT Discount (DiscountPercent | DiscountAmount)>
+export class TidyDiscount extends TidyBase {
+    DiscountPercent = fragment(); DiscountAmount = fragment();
+    protected _subSend(p: XMLBuilder) {
+        p.import(this.DiscountPercent); p.import(this.DiscountAmount);
+    }
+    public isEmpty(): boolean {
+        return !this.DiscountPercent.some(() => true)
+            && !this.DiscountAmount.some(() => true)
+    }
+
+}
+// <!ELEMENT InvoiceDetailItemReferenceRetail (EANID?, EuropeanWasteCatalogID?, Characteristic*)>
+export class TidyInvoiceDetailItemReferenceRetail extends TidyBase {
+    EANID = fragment(); EuropeanWasteCatalogID = fragment(); Characteristic = fragment();
+    protected _subSend(p: XMLBuilder) {
+        p.import(this.EANID); p.import(this.EuropeanWasteCatalogID); p.import(this.Characteristic);
+    }
+    public isEmpty(): boolean {
+        return !this.EANID.some(() => true)
+            && !this.EuropeanWasteCatalogID.some(() => true)
+            && !this.Characteristic.some(() => true)
+    }
+
+}
+
+//<!ELEMENT InvoiceDetailItemRetail (AdditionalPrices?, TotalRetailAmount?, ItemIndicator*, PromotionDealID?, PromotionVariantID?)>
+export class TidyInvoiceDetailItemRetail extends TidyBase {
+    AdditionalPrices = fragment(); TotalRetailAmount = fragment(); ItemIndicator = fragment();
+    PromotionDealID = fragment(); PromotionVariantID = fragment();
+    protected _subSend(p: XMLBuilder) {
+        p.import(this.AdditionalPrices); p.import(this.TotalRetailAmount); p.import(this.ItemIndicator);
+        p.import(this.PromotionDealID); p.import(this.PromotionVariantID);
+    }
+    public isEmpty(): boolean {
+        return !this.AdditionalPrices.some(() => true)
+            && !this.TotalRetailAmount.some(() => true)
+            && !this.ItemIndicator.some(() => true)
+            && !this.PromotionDealID.some(() => true)
+            && !this.PromotionVariantID.some(() => true)
+    }
+}
+
+// <!ELEMENT InvoiceDetailHeaderOrder
+//     (InvoiceDetailOrderInfo, InvoiceDetailOrderSummary)>
+export class TidyInvoiceDetailHeaderOrder extends TidyBase {
+    InvoiceDetailOrderInfo = fragment(); InvoiceDetailOrderSummary = fragment();
+    protected _subSend(p: XMLBuilder) {
+        p.import(this.InvoiceDetailOrderInfo); p.import(this.InvoiceDetailOrderSummary);
+    }
+    public isEmpty(): boolean {
+        return !this.InvoiceDetailOrderInfo.some(() => true)
+            && !this.InvoiceDetailOrderSummary.some(() => true)
+    }
+
+}
+
 // <!ELEMENT InvoiceDetailSummary (SubtotalAmount, Tax, SpecialHandlingAmount?,
 //     ShippingAmount?, GrossAmount?,
 //     InvoiceDetailDiscount?, InvoiceHeaderModifications?, InvoiceDetailSummaryLineItemModifications?,
@@ -193,10 +275,27 @@ export class TidyInvoiceDetailSummary extends TidyBase {
 export class TidyInvoiceDetailShipping extends TidyBase {
     Contact = fragment(); CarrierIdentifier = fragment();
     ShipmentIdentifier = fragment(); DocumentReference = fragment();
+    public isEmpty(): boolean {
+        return !this.Contact.some(() => true)
+            && !this.CarrierIdentifier.some(() => true)
+            && !this.ShipmentIdentifier.some(() => true)
+            && !this.DocumentReference.some(() => true);
+    }
     protected _subSend(p: XMLBuilder) {
         p.import(this.Contact); p.import(this.CarrierIdentifier);
         p.import(this.ShipmentIdentifier); p.import(this.DocumentReference);
 
+    }
+}
+
+// <!ELEMENT InvoiceDetailSummaryLineItemModifications (Modification+)>
+export class TidyInvoiceDetailSummaryLineItemModifications extends TidyBase {
+    Modification = fragment();
+    protected _subSend(p: XMLBuilder) {
+        p.import(this.Modification);
+    }
+    public isEmpty(): boolean {
+        return !this.Modification.some(() => true)
     }
 }
 export class TidyInvoiceDetailRequest extends TidyBase {
@@ -207,4 +306,53 @@ export class TidyInvoiceDetailRequest extends TidyBase {
         p.import(this.InvoiceDetailHeaderOrder); p.import(this.InvoiceDetailSummary);
     }
 }
+export class TidyInvoiceDetailOrderInfo
+    extends TidyBase {
+    OrderReference = fragment(); MasterAgreementReference = fragment(); MasterAgreementIDInfo = fragment();
+    SupplierOrderInfo = fragment();
+    OrderIDInfo = fragment();
 
+    protected _subSend(p: XMLBuilder) {
+        p.import(this.OrderReference); p.import(this.MasterAgreementReference);
+        p.import(this.MasterAgreementIDInfo);
+        p.import(this.SupplierOrderInfo); p.import(this.OrderIDInfo);
+    }
+    public isEmpty(): boolean {
+        return !this.OrderReference.some(() => true)
+            && !this.MasterAgreementReference.some(() => true)
+            && !this.MasterAgreementIDInfo.some(() => true)
+            && !this.OrderIDInfo.some(() => true)
+    }
+}
+// <!ELEMENT ModificationDetail (Description?, IdReference?, ParentID?, Extrinsic*)>
+export class TidyModificationDetail
+    extends TidyBase {
+        Description = fragment(); IdReference = fragment(); ParentID = fragment();
+        Extrinsic = fragment();
+
+    protected _subSend(p: XMLBuilder) {
+        p.import(this.Description); p.import(this.IdReference);
+        p.import(this.ParentID);
+        p.import(this.Extrinsic);
+    }
+    public isEmpty(): boolean {
+        return !this.Description.some(() => true)
+            && !this.IdReference.some(() => true)
+            && !this.ParentID.some(() => true)
+            && !this.Extrinsic.some(() => true)
+    }
+}
+
+// <!ELEMENT InvoicePartner (Contact, IdReference*)>
+export class TidyInvoicePartner
+    extends TidyBase {
+        Contact = fragment(); IdReference = fragment(); 
+
+    protected _subSend(p: XMLBuilder) {
+        p.import(this.Contact); p.import(this.IdReference);
+    }
+    public isEmpty(): boolean {
+        return !this.Contact.some(() => true)
+            && !this.IdReference.some(() => true)
+    }
+}

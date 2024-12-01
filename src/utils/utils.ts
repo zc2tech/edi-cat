@@ -59,7 +59,7 @@ export default class Utils {
         const date = parse(dateStr, 'yyyyMMdd', new Date());
         if (!Utils.isValidDate(date)) {
             return undefined;
-        }
+        }         
 
         // Set to 12:00 UTC
         date.setUTCHours(12, 0, 0, 0);
@@ -81,7 +81,11 @@ export default class Utils {
         }
         Utils.sDefaultTMZ = dateStr.trim().substring(14).trim(); // like +11:00
         const date = parse(dateStr.trim(), 'yyyyMMddHHmmssXXXX', new Date());
-        return date;
+        if (isNaN(date.getTime())) {
+            return undefined
+        } else {
+            return date;
+        }
     }
 
     /**
@@ -98,11 +102,42 @@ export default class Utils {
             return undefined;
         }
 
+        // we need to consider a special format like "2023-04-28T17:55+08:00" which is "Hhmm" not "HHmmss"
+        let iPosT = dateStr.indexOf('T');
+        if (iPosT) {
+            let sSecPart = dateStr.substring(iPosT + 6);
+            if (!sSecPart.startsWith(':')) {
+                // if we cannot find second part, it's obviouse the timezone part
+                // we concatenate them to a correct format
+                dateStr = dateStr.substring(0, iPosT + 6) + ':00' + sSecPart;
+            }
+        }
+
         Utils.sDefaultTMZ = dateStr.trim().substring(19).trim(); // like +11:00
         const date = parse(dateStr.trim(), "yyyy-MM-dd'T'HH:mm:ssxxx", new Date());
-        return date;
+        if (isNaN(date.getTime())) {
+            return undefined
+        } else {
+            return date;
+        }
     }
 
+    /**
+     * get String like: 20170106060000ED
+     * Since the Timezone part still need MAPS object,
+     * we use a not very efficient way
+     */
+    static getFullDateStr(d?: Date | undefined): string {
+        let d2: Date = d ?? new Date();
+        let sFormat = 'yyyyMMddHHmmss';
+        let sTimePart: string;
+        if (Utils.sDefaultTMZ) {
+            sTimePart = formatInTimeZone(d2, Utils.sDefaultTMZ, sFormat);
+        } else {
+            sTimePart = format(d2, sFormat);
+        }
+        return sTimePart ? sTimePart + this.getTMZ2(d) : '';
+    }
     static getYYMMDD(d?: Date | undefined): string {
         let d2: Date = d ?? new Date();
         let sFormat = 'yyMMdd';
@@ -169,6 +204,10 @@ export default class Utils {
 
     /**
      * Usually don't need check
+     * It will not complete with 'Z' timezone and 12:00:00 time
+     * 
+     * If you have above requirement, use dateStrFromDTM2 function
+     * 
      * @param dateStr 
      * @returns 
      */
@@ -183,6 +222,7 @@ export default class Utils {
     /**
      * From: yyyy-MM-dd'T'HH:mm:ssxxx
      * To: CCYYMMDDHHMMSSZZZ	304
+     * The timezone part is stiff as M01 P09 ..., no 'AD','GM' 'ET' etc.
      * @param dateStr 
      * @returns 
      */
@@ -199,20 +239,26 @@ export default class Utils {
     /**
      * From: yyyy-MM-dd'T'HH:mm:ssxxx
      * To: CCYYMMDDHHMMSSZZZ	304
+     * recommend to use as it's very flexible for TimeZone
      * @param fromStr DateString from XML, so pretty formal
      * @returns 
      */
-    static dateStr304TZ(fromStr: string, toTZ: string): string {
+    static dateStr304TZ(fromStr: string, toTZ?: string): string {
         let date: Date = Utils.parseToDateSTD2(fromStr);
         let strDate: string = '';
         if (Utils.isValidDate(date)) {
             // timezone: GM, or +00:00 or -11:00 etc.
             let sFormatedDate = '';
-            if (toTZ == 'GM') {
-                sFormatedDate = formatInTimeZone(date, 'Z', 'yyyyMMddHHmmssx');
+            let sToFormat = 'yyyyMMddHHmmssx';
+            if (!toTZ) {
+                // sDefaultTMZ is set by parseToDateSTD2
+                sFormatedDate = formatInTimeZone(date, Utils.sDefaultTMZ, sToFormat);
+            } else if (toTZ == 'GM') {
+                sFormatedDate = formatInTimeZone(date, 'Z', sToFormat);
             } else {
-                sFormatedDate = formatInTimeZone(date, toTZ, 'yyyyMMddHHmmssx');
+                sFormatedDate = formatInTimeZone(date, toTZ, sToFormat);
             }
+
             if (sFormatedDate && sFormatedDate.length > 14) {
                 let sTZ = sFormatedDate.substring(14);
                 let sMappedTZ = UTILS_MAP.mapTimeZone3[sTZ];
@@ -221,6 +267,24 @@ export default class Utils {
                 return '';
             }
 
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     * From: yyyy-MM-dd'T'HH:mm:ssxxx
+     * To: CCYYMMDD	102
+     * @param fromStr DateString from XML, so pretty formal
+     * @returns 
+     */
+    static dateStr102(fromStr: string, toTZ?: string): string {
+        let date: Date = Utils.parseToDateSTD2(fromStr);
+        let strDate: string = '';
+        if (Utils.isValidDate(date)) {
+            // timezone: GM, or +00:00 or -11:00 etc.
+            let sFormatedDate = '';
+            return this.getYYYYMMDD(date);
         } else {
             return '';
         }
@@ -236,11 +300,13 @@ export default class Utils {
     /**
      * Date String from sample like: DTM*004*20180810*0930*CT~
      * It will use local date to complete info that is missing.
+     * to Format: "yyyy-MM-dd'T'HH:mm:ssxxx"
      * 
      * @param YMDStr 
+     * @param toTimezone If not specified, then use Utils.sDefaultTMZ , if 'local' then use Local Time Zone
      * @returns 
      */
-    static dateStrFromDTM(YMDStr: string, timeStr: string, timezone: string): string {
+    static dateStrFromDTM(YMDStr: string, timeStr: string, timezone: string, toTimezone?: string): string {
         if (YMDStr.length != 8) {
             return undefined;
         }
@@ -271,7 +337,15 @@ export default class Utils {
         }
 
         if (Utils.isValidDate(date)) {
-            return format(date, "yyyy-MM-dd'T'HH:mm:ssxxx");
+            if (toTimezone) {
+                if (toTimezone == 'local') {
+                    return format(date, "yyyy-MM-dd'T'HH:mm:ssxxx");
+                } else {
+                    return formatInTimeZone(date, toTimezone, "yyyy-MM-dd'T'HH:mm:ssxxx");
+                }
+            }
+            return formatInTimeZone(date, Utils.sDefaultTMZ, "yyyy-MM-dd'T'HH:mm:ssxxx");
+            //
         } else {
             return undefined;
         }
@@ -281,16 +355,18 @@ export default class Utils {
     /**
      * [20180322] [IG-3125] MB: added info: Date/Time Handling:
      * Default the time to noon (12:00) and timezone to UTC (+00:00) on all dates 
-     * when not present except Order reference dates.
+     * 
+     * to Format: "yyyy-MM-dd'T'HH:mm:ssxxx" 
+     *
      * @param dateTime 
      * @param qualifier 
      * @returns
      */
-    static dateStrFromDTM2(dateTime: string, qualifier: string): string {
+    static dateStrFromDTM2(dateTime: string, qualifier?: string): string {
         let ymd: string;
         let tmr: string;
         let tmzone: string;
-        if(!dateTime || !qualifier) {
+        if (!dateTime) {
             return '';
         }
         switch (qualifier) {
@@ -307,7 +383,7 @@ export default class Utils {
                     return '';
                 }
                 ymd = dateTime.substring(0, 8);
-                tmr = dateTime.substring(8, 4) + '00';
+                tmr = dateTime.substring(8, 12) + '00';
                 tmzone = 'Z';
                 break;
             case '204': // CCYYMMDDHHMMSS	204
@@ -315,7 +391,7 @@ export default class Utils {
                     return '';
                 }
                 ymd = dateTime.substring(0, 8);
-                tmr = dateTime.substring(8, 6);
+                tmr = dateTime.substring(8, 14);
                 tmzone = 'Z';
                 break;
             case '303': // CCYYMMDDHHMMZZZ	303
@@ -323,7 +399,7 @@ export default class Utils {
                     return '';
                 }
                 ymd = dateTime.substring(0, 8);
-                tmr = dateTime.substring(8, 4) + '00';
+                tmr = dateTime.substring(8, 12) + '00';
                 tmzone = UTILS_MAP.mapTimeZone[dateTime.substring(12)];
                 break;
             case '304': // CCYYMMDDHHMMSSZZZ	304
@@ -331,7 +407,7 @@ export default class Utils {
                     return '';
                 }
                 ymd = dateTime.substring(0, 8);
-                tmr = dateTime.substring(8, 6);
+                tmr = dateTime.substring(8, 14);
                 tmzone = UTILS_MAP.mapTimeZone[dateTime.substring(14)];
                 break;
             case '718':
@@ -342,10 +418,20 @@ export default class Utils {
                 return '';
                 break;
             default:
+                // automatically judge
+                let iLen = dateTime.length;
+                if(iLen == 8) {
+                    return Utils.dateStrFromDTM2(dateTime,'102');
+                } else if(dateTime.length >= 16 ) {
+                    return Utils.dateStrFromDTM2(dateTime,'304');
+                }
+                
         } // end switch
-        const date = parse(ymd + tmr + tmzone, 'yyyyMMddHHmmssXXXX', new Date());
-        if (Utils.isValidDate(date)) {
-            return formatInTimeZone(date, 'Z', "yyyy-MM-dd'T'HH:mm:ssxxx");
+        let theDate = parse(ymd + tmr + tmzone, 'yyyyMMddHHmmssXXXX', new Date());
+        let sRTN:string;
+        if (Utils.isValidDate(theDate)) {
+            sRTN = formatInTimeZone(theDate, 'Z', "yyyy-MM-dd'T'HH:mm:ssxxx");
+            return sRTN;
             //return format(date, "yyyy-MM-dd'T'HH:mm:ssxxx");
         }
         return '';
@@ -353,10 +439,13 @@ export default class Utils {
 
     /**
      * [CCYYMMDDHHMMSS[timezone]] => xml date format
+     * 
      * @param dateTimeWithTZ 
+     * @param bFormatUseLocalTZ if true, use local timezone to 'format' else use timezone in the param dateTimeWithTZ, 
+     *          the time itself will not change
      * @returns 
      */
-    static dateStrFromREFDTM(dateTimeWithTZ: string): string {
+    static dateStrFromREFDTM(dateTimeWithTZ: string, bFormatUseLocalTZ: boolean = true): string {
         if (dateTimeWithTZ.length < 15) {
             return '';
         }
@@ -367,8 +456,11 @@ export default class Utils {
         let sNewDateTime = dateTimeWithTZ.substring(0, 14) + UTILS_MAP.mapTimeZone[sTZ];
         const dDate = parse(sNewDateTime, 'yyyyMMddHHmmssXXXX', new Date());
         if (Utils.isValidDate(dDate)) {
-            //return formatInTimeZone(date, 'Z', "yyyy-MM-dd'T'HH:mm:ssxxx");
-            return format(dDate, "yyyy-MM-dd'T'HH:mm:ssxxx");
+            if (bFormatUseLocalTZ) {
+                return format(dDate, "yyyy-MM-dd'T'HH:mm:ssxxx");
+            } else {
+                return formatInTimeZone(dDate, UTILS_MAP.mapTimeZone[sTZ], "yyyy-MM-dd'T'HH:mm:ssxxx");
+            }
         } else {
             return '';
         }
@@ -513,41 +605,41 @@ export class UTILS_MAP {
         "+12:00": "12",
         "-12:00": "13",
         "-11:00": "14",
-        "-10:00": "15",
+        //"-10:00": "15",
         "-09:00": "16",
-        "-08:00": "17",
-        "-07:00": "18",
-        "-06:00": "19",
-        "-05:00": "20",
-        "-04:00": "21",
-        "-03:00": "22",
+        //"-08:00": "17",
+        //"-07:00": "18",
+        //"-06:00": "19",
+        //"-05:00": "20",
+        //"-04:00": "21",
+        //"-03:00": "22",
         "-02:00": "23",
         "-01:00": "24",
-        // "-08:00": "AD",
+        "-08:00": "AD",
         // "-09:00": "AS",
         // "-09:00": "AT",
         // "-05:00": "CD",
         // "-06:00": "CS",
         // "-06:00": "CT",
         // "-04:00": "ED",
-        // "-05:00": "ES",
-        // "-05:00": "ET",
+        //"-05:00": "ES",
+        "-05:00": "ET",
         "+00:00": "GM",
-        // "-10:00": "HD",
-        // "-10:00": "HS",
-        // "-10:00": "HT",
-        // "-06:00": "MD",
-        // "-07:00": "MS",
-        // "-07:00": "MT",
+        "-10:00": "HD",
+        //"-10:00": "HS",
+        //"-10:00": "HT",
+        "-06:00": "MD",
+        //"-07:00": "MS",
+        //"-07:00": "MT",
         "-02:30": "ND",
         "-03:30": "NS",
-        // "-03:30": "NT",
-        // "-07:00": "PD",
-        // "-08:00": "PS",
-        // "-08:00": "PT",
-        // "-03:00": "TD",
-        // "-04:00": "TS",
-        // "-04:00": "TT",
+        //"-03:30": "NT",
+        "-07:00": "PD",
+        //"-08:00": "PS",
+        //"-08:00": "PT",
+        "-03:00": "TD",
+        //"-04:00": "TS",
+        "-04:00": "TT",
         "-00:00": "UT",
     }
 
@@ -571,7 +663,8 @@ export class UTILS_MAP {
         "-08": "M08",
         "-07": "M07",
         "-06": "M06",
-        "-05": "M05",
+        //"-05": "M05",
+        "-05": "ET",
         "-04": "M04",
         "-03": "M03",
         "-02": "M02",

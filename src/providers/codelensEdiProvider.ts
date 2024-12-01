@@ -27,7 +27,7 @@ export class CodelensEdiProvider implements vscode.CodeLensProvider {
 
   async provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.CodeLens[] | null | undefined> {
 
-    if (vscode.workspace.getConfiguration(constants.configuration.ediTsuya).get(constants.configuration.enableCodelens) !== true) {
+    if (vscode.workspace.getConfiguration(constants.configuration.ediCat).get(constants.configuration.enableCodelens) !== true) {
       return [];
     }
 
@@ -139,7 +139,7 @@ export class CodelensEdiProvider implements vscode.CodeLensProvider {
   }
 
   public resolveCodeLens(codeLens: vscode.CodeLens, token: vscode.CancellationToken) {
-    if (vscode.workspace.getConfiguration(constants.configuration.ediTsuya).get(constants.configuration.enableCodelens) !== true) {
+    if (vscode.workspace.getConfiguration(constants.configuration.ediCat).get(constants.configuration.enableCodelens) !== true) {
       return null;
     }
 

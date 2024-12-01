@@ -83,7 +83,8 @@ export class FileTypeSelector {
                 this._labelSelectable(documentUri, versionKeys.X12_Family_846)
                 break;
             case "850":
-                this._labelSelectable(documentUri, versionKeys.X12_Family_850)
+                this._labelFixedSingle(versionKeys.X12_850);
+                //this._labelSelectable(documentUri, versionKeys.X12_Family_850)
                 break;
             case "855":
                 this._labelFixedSingle(versionKeys.X12_855);
@@ -100,6 +101,9 @@ export class FileTypeSelector {
                 break;
             case "862":
                 this._labelFixedSingle(versionKeys.X12_862);
+                break;
+            case "865":
+                this._labelFixedSingle(versionKeys.X12_865);
                 break;
             case "866":
                 this._labelFixedSingle(versionKeys.X12_866);
@@ -150,6 +154,9 @@ export class FileTypeSelector {
     }
 
     private _labelFixedSingle(lblText: string) {
+        if(!this.statusFileType) {
+            return;
+        }
         this.statusFileType.command = null;
         if (lblText == "") {
             this.statusFileType.text = lblText;
@@ -160,7 +167,11 @@ export class FileTypeSelector {
         this.statusFileType.color = "white";
     }
     private _labelSelectable(documentUri: vscode.Uri, options: string[]) {
+        if(!this.statusFileType) {
+            return;
+        }
         this.statusFileType.command = "edi-cat.showQuickPick";
+        // this.statusFileType.command = "edi-cat.test-cmd";
         this.statusFileType.color = "yellow";
         this.options = options;
         let stateVersion = ParserUtils.getStateVersionKey(documentUri);

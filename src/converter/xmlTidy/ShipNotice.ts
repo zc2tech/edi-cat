@@ -2,6 +2,14 @@ import { fragment } from "xmlbuilder2";
 import { XMLBuilder } from "xmlbuilder2/lib/interfaces";
 import { TidyBase } from "./TidyBase";
 
+/**
+ * Pair for contain qty and UOM
+ */
+export class TidyQtyUom {
+    public qty: string;
+    public uom: string;
+}
+
 export class TidyShipNoticeHeader extends TidyBase {
     ServiceLevel = fragment(); DocumentReference = fragment(); Contact = fragment();
     LegalEntity = fragment(); OrganizationalUnit = fragment();
@@ -19,6 +27,11 @@ export class TidyShipNoticeHeader extends TidyBase {
     }
 }
 
+/**
+ * <!ELEMENT ShipControl (CarrierIdentifier+, ShipmentIdentifier+,
+                       PackageIdentification?, (Route|TransportInformation)*, Contact*, Comments*,
+                       Extrinsic*)>
+ */
 export class TidyShipControl extends TidyBase {
     CarrierIdentifier = fragment(); ShipmentIdentifier = fragment();
     PackageIdentification = fragment();
@@ -32,6 +45,10 @@ export class TidyShipControl extends TidyBase {
         p.import(this.Comments); p.import(this.
             Extrinsic);
     }
+    public isEmpty(): boolean {
+        return !this.CarrierIdentifier.some(() => true)
+            && !this.ShipmentIdentifier.some(() => true)
+    }    
 }
 
 /**
@@ -56,7 +73,9 @@ export class TidyShipNoticePortion
  */
 export class TidyShipNoticeItem extends TidyBase {
     parentID: string;
-    tPacking: TidyPackaging = new TidyPackaging(); // to save some data when passing HL I:Item
+    tPacking: TidyPackaging = new TidyPackaging(); // to save some data when passing HL I:Item    
+    PO4_QTY_UOM: TidyQtyUom = new TidyQtyUom(); // save for data DispatchQuantity
+    SN1_QTY_UOM: TidyQtyUom = new TidyQtyUom(); // save for data DispatchQuantity
     ItemID = fragment(); ShipNoticeItemDetail = fragment(); UnitOfMeasure = fragment();
     Packaging = fragment(); Hazard = fragment(); Batch = fragment();
     SupplierBatchID = fragment();
@@ -119,6 +138,10 @@ export class TidyPackaging extends TidyBase {
         p.import(this.AssetInfo); p.import(this.PackagingIndustry); p.import(this.StoreCode);
         p.import(this.Extrinsic);
     }
+    public isEmpty(): boolean {
+        return !this.PackagingCode.some(() => true)
+            && !this.Dimension.some(() => true)
+    }    
 }
 
 export class TidyTermsOfDelivery extends TidyBase {
@@ -127,6 +150,23 @@ export class TidyTermsOfDelivery extends TidyBase {
     protected _subSend(p: XMLBuilder) {
         p.import(this.TermsOfDeliveryCode); p.import(this.ShippingPaymentMethod); p.import(this.TransportTerms);
         p.import(this.Address); p.import(this.Comments);
+    }
+    public isEmpty(): boolean {
+        return !this.TermsOfDeliveryCode.some(() => true)
+            && !this.ShippingPaymentMethod.some(() => true);
+    }
+}
+/**
+ * <!ELEMENT Batch (BuyerBatchID?, SupplierBatchID?, PropertyValuation*)>
+ */
+export class TidyBatch extends TidyBase {
+    BuyerBatchID = fragment(); SupplierBatchID = fragment(); PropertyValuation = fragment();
+    protected _subSend(p: XMLBuilder) {
+        p.import(this.BuyerBatchID); p.import(this.SupplierBatchID); p.import(this.PropertyValuation);
+    }
+    public isEmpty(): boolean {
+        return !this.BuyerBatchID.some(() => true)
+            && !this.SupplierBatchID.some(() => true);
     }
 }
 
@@ -145,6 +185,10 @@ export class TidyShipNoticeItemDetail extends TidyBase {
     }
 }
 
+/**
+ * <!ELEMENT TermsOfTransport (SealID?, SealingPartyCode?, EquipmentIdentificationCode?, 
+ *  TransportTerms?, Dimension*, Extrinsic*)>
+ */
 export class TidyTermsOfTransport extends TidyBase {
     SealID = fragment(); SealingPartyCode = fragment(); EquipmentIdentificationCode = fragment();
     TransportTerms = fragment(); Dimension = fragment(); Extrinsic = fragment();
@@ -153,13 +197,32 @@ export class TidyTermsOfTransport extends TidyBase {
         p.import(this.SealID); p.import(this.SealingPartyCode); p.import(this.EquipmentIdentificationCode);
         p.import(this.TransportTerms); p.import(this.Dimension); p.import(this.Extrinsic);
     }
+    public isEmpty(): boolean {
+        return !this.SealID.some(() => true)
+            && !this.SealingPartyCode.some(() => true)
+            && !this.EquipmentIdentificationCode.some(() => true)
+            && !this.TransportTerms.some(() => true)
+            && !this.Dimension.some(() => true)
+            && !this.Extrinsic.some(() => true)
+    }
 }
 
+/**
+ * <!ELEMENT ShipNoticeItemRetail (BestBeforeDate?, ExpiryDate?, 
+ *  FreeGoodsQuantity?,  PromotionDealID?, PromotionVariantID?)>
+ */
 export class TidyShipNoticeItemRetail extends TidyBase {
     BestBeforeDate = fragment(); ExpiryDate = fragment(); FreeGoodsQuantity = fragment();
     PromotionDealID = fragment(); PromotionVariantID = fragment();
     protected _subSend(p: XMLBuilder) {
         p.import(this.BestBeforeDate); p.import(this.ExpiryDate); p.import(this.FreeGoodsQuantity);
         p.import(this.PromotionDealID); p.import(this.PromotionVariantID);
+    }
+    public isEmpty(): boolean {
+        return !this.BestBeforeDate.some(() => true)
+            && !this.ExpiryDate.some(() => true)
+            && !this.FreeGoodsQuantity.some(() => true)
+            && !this.PromotionDealID.some(() => true)
+            && !this.PromotionVariantID.some(() => true)
     }
 }

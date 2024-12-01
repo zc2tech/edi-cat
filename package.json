@@ -1,11 +1,11 @@
 {
   "name": "vscode-edi-cat",
   "displayName": "EDI-Cat",
-  "description": "Help to validate and create X12/EDIFACT document",
+  "description": "Editor for X12/EDIFACT document",
   "icon": "img/cat.png",
-  "version": "0.0.2",
-  "private": true,
-  "publisher": "Julian Xu",
+  "version": "0.0.8",
+  "private": false,
+  "publisher": "JulianXu",
   "author": {
     "name": "Julian Xu",
     "email": "julian.xu@aliyun.com"
@@ -16,6 +16,12 @@
     "type": "git",
     "url": "https://github.com/zc2tech/edi-cat.git"
   },
+  "keywords": [
+    "edicat",
+    "edi-cat",
+    "x12",
+    "converter"
+  ],
   "engines": {
     "vscode": "^1.83.0"
   },
@@ -74,7 +80,8 @@
           "EDI dat file"
         ],
         "extensions": [
-          ".dat",".txt"
+          ".dat",
+          ".txt"
         ],
         "configuration": "./language-configuration/edidat.json"
       },
@@ -130,6 +137,11 @@
       }
     ],
     "commands": [
+      {
+        "command": "edi-cat.test-cmd",
+        "title": "Test Cmd ",
+        "category": "EDI Cat"
+      },
       {
         "command": "edi-cat.refreshTreeAssistantExplorer",
         "title": "Refresh Assistant Explorer",
@@ -210,12 +222,12 @@
         "edi-cat.buyerIC": {
           "type": "string",
           "default": "ARIBA",
-          "description": "The Buyer Interchange ID for generated EDIFACT"
+          "description": "The Buyer Interchange ID for generated EDIFACT/X12"
         },
         "edi-cat.buyerGP": {
           "type": "string",
           "default": "BUYER_GP",
-          "description": "The Buyer Group ID for generated EDIFACT"
+          "description": "The Buyer Group ID for generated EDIFACT/X12"
         },
         "edi-cat.supplierANID": {
           "type": "string",
@@ -225,12 +237,12 @@
         "edi-cat.supplierIC": {
           "type": "string",
           "default": "SUPPLIER_IC",
-          "description": "The Supplier Interchange ID for generated EDIFACT"
+          "description": "The Supplier Interchange ID for generated EDIFACT/X12"
         },
         "edi-cat.supplierGP": {
           "type": "string",
           "default": "SUPPLIER_GP",
-          "description": "The Supplier Group ID for generated EDIFACT"
+          "description": "The Supplier Group ID for generated EDIFACT/X12"
         }
       }
     }

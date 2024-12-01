@@ -91,7 +91,7 @@ export class Info_DESADV extends DocInfoBase {
         },
     };
     static usage_SG2_SG4_COM = {
-        "3155": DocInfoBase.CommuChannelQualifier
+        "3155": DocInfoBase.CommuChannelQualifier3
     };
     static usage_SG5_TOD = {
         "4055": DocInfoBase.TermsOfDelivery,

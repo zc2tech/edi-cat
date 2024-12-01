@@ -19,7 +19,7 @@ import { MAPStoXML } from "../converterBase";
  *and If not cXML/Request/OrderRequest/ItemOut//@agreementType='scheduling_agreement'  (DELJIT)												
  *
  */
-export class cvt_Order_ORDCHG extends XmlConverterBase {
+export class Cvt_Order_ORDCHG extends XmlConverterBase {
     protected _convertErrs: ConvertErr[];
     protected _bHideAmount = false;
     protected _bHideUnitPrice = false;
@@ -117,7 +117,7 @@ export class cvt_Order_ORDCHG extends XmlConverterBase {
 
         // SG3 NAD DP
         let addressDP = this._e('TermsOfDelivery', nRequestHeader);
-        this._NAD('ST', addressDP);
+        this._NAD('DP', addressDP);
 
         // SG5 Group5 CTA DL
         this._CTA('DL', '', '', this._e('Address', addressDP));
@@ -470,11 +470,15 @@ export class cvt_Order_ORDCHG extends XmlConverterBase {
             this._setV(IMD, 301, 'Configurable');
         }
         let vDomain = this._v('ItemDetailIndustry/ItemDetailRetail/Characteristic/@domain', nItemDetail);
-        if (vDomain && this._mei(MAPS.mapIMD7081, vDomain)) {
+        if (vDomain) {
             // IMD
             let IMD = this._initSegEdi('IMD', 3);
             this._setV(IMD, 1, 'B');
-            this._setV(IMD, 2, this._mcs(MAPS.mapIMD7081, vDomain));
+            if (this._mei(MAPS.mapIMD7081, vDomain)) {
+                this._setV(IMD, 2, this._mcs(MAPS.mapIMD7081, vDomain));
+            } else {
+                this._setV(IMD, 2, '79');
+            }
             this._setV(IMD, 3, this._v('ItemDetailIndustry/ItemDetailRetail/Characteristic/@value', nItemDetail));
         }
 
@@ -484,7 +488,7 @@ export class cvt_Order_ORDCHG extends XmlConverterBase {
             let vType = this._v('@type', nDim);
             let MEA = this._initSegEdi('MEA', 3);
             this._setV(MEA, 1, 'AAE');
-            if (this._mes(MAPS.mapMEA6313, vType)) {
+            if (this._mei(MAPS.mapMEA6313, vType)) {
                 this._setV(MEA, 201, this._mci(MAPS.mapMEA6313, vType));
             } else {
                 this._setV(MEA, 201, 'ZZZ');
@@ -1141,7 +1145,7 @@ export class cvt_Order_ORDCHG extends XmlConverterBase {
 
                 // SG29 RFF ACJ
                 let vMaterialProvisionIndicator = this._v('@materialProvisionIndicator', nSubComp);
-                this._RFF_KV('ACJ', vMaterialProvisionIndicator);
+                this._RFF_KV_EDI('ACJ', vMaterialProvisionIndicator);
 
                 // SG30 Map this loop SG30 only if ItemOut/ScheduleLine/SubcontractingComponent/Batch is available
                 let nBatch = this._e('Batch', nSubComp);
@@ -1969,9 +1973,7 @@ export class cvt_Order_ORDCHG extends XmlConverterBase {
         if (sPhoneCountryCode || sPhoneAreaOrCityCode || sPhoneNumber) {
             let COM = this._initSegEdi('COM', 1);
             let sVal = sPhoneCountryCode + '-' + sPhoneAreaOrCityCode + '-' + sPhoneNumber;
-            // trim twice
-            sVal = sVal.startsWith('-') ? sVal.substring(1) : sVal;
-            sVal = sVal.startsWith('-') ? sVal.substring(1) : sVal;
+            sVal = this._trim(sVal);
             this._setV(COM, 101, sVal);
             this._setV(COM, 102, 'TE');
         }
@@ -1983,9 +1985,7 @@ export class cvt_Order_ORDCHG extends XmlConverterBase {
         if (sFaxCountryCode || sFaxAreaOrCityCode || sFaxNumber) {
             let COM = this._initSegEdi('COM', 1);
             let sVal = sFaxCountryCode + '-' + sFaxAreaOrCityCode + '-' + sFaxNumber;
-            // trim twice
-            sVal = sVal.startsWith('-') ? sVal.substring(1) : sVal;
-            sVal = sVal.startsWith('-') ? sVal.substring(1) : sVal;
+            sVal =this._trim(sVal);
             this._setV(COM, 101, sVal);
             this._setV(COM, 102, 'FX');
         }
@@ -2003,31 +2003,31 @@ export class cvt_Order_ORDCHG extends XmlConverterBase {
     private _SG1_RFF_DTM(nRequestHeader: Element) {
         // RFF PW
         let sOrgID = this._v('@OriginalId', nRequestHeader);
-        this._RFF_KV('PW', sOrgID);
+        this._RFF_KV_EDI('PW', sOrgID);
         // RFF AGI
         let sReqID = this._v('@requisitionID', nRequestHeader);
-        this._RFF_KV('AGI', sReqID);
+        this._RFF_KV_EDI('AGI', sReqID);
         // RFF RE
         let sReleaseReq = this._v('@releaseRequired', nRequestHeader);
-        this._RFF_KV('RE', sReleaseReq);
+        this._RFF_KV_EDI('RE', sReleaseReq);
         // RFF CT
         let sAgreementID = this._v('@agreementID', nRequestHeader);
-        this._RFF_KV('CT', sAgreementID);
+        this._RFF_KV_EDI('CT', sAgreementID);
         // RFF BC
         let sParentAgreementID = this._v('@parentAgreementID', nRequestHeader);
-        this._RFF_KV('BC', sParentAgreementID);
+        this._RFF_KV_EDI('BC', sParentAgreementID);
         // RFF CR
         let sCustomerRef = this._v('IdReference[@domain="CustomerReferenceID"]/@identifier', nRequestHeader);
-        this._RFF_KV('CR', sCustomerRef);
+        this._RFF_KV_EDI('CR', sCustomerRef);
         // RFF UC
         let sUltiCustomer = this._v('IdReference[@domain="UltimateCustomerReferenceID"]/@identifier', nRequestHeader);
-        this._RFF_KV('UC', sUltiCustomer);
+        this._RFF_KV_EDI('UC', sUltiCustomer);
         // RFF ACD
         let sACD = this._v('IdReference[@domain="AdditionalReferenceID"]/@identifier', nRequestHeader);
-        this._RFF_KV('ACD', sACD);
+        this._RFF_KV_EDI('ACD', sACD);
         // RFF GN
         let sGN = this._v('IdReference[@domain="governmentNumber"]/@identifier', nRequestHeader);
-        this._RFF_KV('GN', sGN);
+        this._RFF_KV_EDI('GN', sGN);
 
         // RFF AIU
         let sPNumber = this._v('Payment/Pcard/@number', nRequestHeader);
@@ -2076,13 +2076,13 @@ export class cvt_Order_ORDCHG extends XmlConverterBase {
 
         // RFF IT
         let sIT = this._prv('/cXML/Header/From/Credential[@domain="AribaNetworkID"]/Identity');
-        this._RFF_KV('IT', sIT);
+        this._RFF_KV_EDI('IT', sIT);
 
         // RFF VA
         let sVA = this._v('Tax/TaxDetail/Description', nRequestHeader);
         let sTaxPointDate = this._v('Tax/TaxDetail/@taxPointDate', nRequestHeader);
         let sPayDate = this._v('Tax/TaxDetail/@paymentDate', nRequestHeader);
-        this._RFF_KV('VA', sVA);
+        this._RFF_KV_EDI('VA', sVA);
         if (sTaxPointDate) {
             let DTM = this._initSegEdi('DTM', 1);
             this._setV(DTM, 101, '131');

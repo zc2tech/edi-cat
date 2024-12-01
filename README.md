@@ -1,24 +1,52 @@
 # EDI-Cat README
 
-AN EDIFACT/X12 file viewer, formatter.
+AN EDIFACT/X12 file viewer, formatter, converter.
 
 ## Install
-It can be installed for as an extension for vscode
-under Windows or MacOS
-
-make sure VS code version >= 1.83
-
-![VSC Version](./docs/images/vsc_version.jpg "VSC Version")
-
-then go to extensions menu, use "...->Install from VSIX" menu, then select the downloaded VSIX to install
-![Install from VSIX](./docs/images/install_vsix.jpg "Install from VSIX")
+It's a VSCode Extension, search this extension and install it.
+![Install from Marketplace](./docs/images/install_from_marketplace.jpg "Install from Marketplace")
 
 ## Features
 
-##### Assistant Explorer. 
-When you open .x12/.edi/.edifact file, it will give you assistant correspondingly. Then you can use "+" to add sample code to you file.
 
-![Assistant Explorer](./docs/images/assistant.jpg "Assistant Explorer")
+##### Convert from cXML to X12 or EDIFACT D96A
+1) Open a cXML (OrderConfirmation, ASN, Invoice)
+2) Make sure there is no xml syntax and DTD validation error.
+  (Recommend you to install other extension to check XML)
+3) Use menu "View->Command Palette", then find command "EDI Cat: Convert to ..."
+4) Then use menu cXML_to_X12 or cXML_to_EDIFACT_D96A
+![Converter](./docs/images/convert.gif "Converter")
+
+##### Parse Document
+Make sure document version correctly recognized and
+there is no validation error.
+Use menu "view->Command Palette..." and search for "Parse Document".
+
+![Parse Document 01](./docs/images/parse_document01.jpg "Parse Document 01")
+
+after executing this command, the structure of the file displays. 
+You still can hover to key element to see details.
+
+![Parse Document 02](./docs/images/parse_document02.jpg "Parse Document 02")
+
+##### Syntax Check
+Extention can detect file version automatically and display it on right-bottom of window.
+Usually the color is normal white, but if it's yellow, it means user need to click there to help it decide the version.
+
+![Code List display](./docs/images/version_picker.jpg "Code List display")
+
+It can do Control  Number check
+
+![Control Number check](./docs/images/interchange_check.jpg "Control Number check")
+
+Or Syntax Check, below is example when NTE segment is deliberately put before BIG segment, which caused an error.
+
+![Syntax Check](./docs/images/syntax_check.jpg "Syntax Check")
+
+##### Format Document
+For .xml or .x12 .edi .edifact File, right click on the content,
+There is a context menu "Format Document" to help you format this document.
+![Format Document](./docs/images/format.jpg "Format Document")
 
 ##### Hover for detail
 Mouse hover to some fields like Currency, Country, UoM, Timezone, it will show you the detail meaning of the value.
@@ -42,23 +70,9 @@ Code List display:
 
 ![Code List display](./docs/images/codelist03.jpg "Code List display")
 
-##### Syntax Check
-Before letting extension to do Syntax Check, you need to specify document version before that, because it cannot determine some version like 850, 856 automatically.
-The menu is on the bottom-left, a yellow label.
-
-![Code List display](./docs/images/version_picker.jpg "Code List display")
-
-It can do Control  Number check
-
-![Control Number check](./docs/images/interchange_check.jpg "Control Number check")
-
-Or Syntax Check, below is example when QTY segment is deliberately put under DTM segment, which caused an error.
-
-![Syntax Check](./docs/images/syntax_check.jpg "Syntax Check")
-
 ##### Codelens
 Make sure document version correctly selected and there is no syntax error.
-Use menu "view->Command Palette..." and search for "Toggle Codelens"
+Use menu "view->Command Palette..." and search for "Toggle Codelens".
 
 ![Toggle Codelens 01](./docs/images/toggle01.jpg "Toggle Codelens 01")
 
@@ -67,33 +81,22 @@ No group means it's under ROOT group.
 
 ![Toggle Codelens 02](./docs/images/toggle02.jpg "Toggle Codelens 02")
 
-##### Parse Document
-Make sure document version correctly selected and there is no syntax error.
-Use menu "view->Command Palette..." and search for "Parse Document".
-
-![Parse Document 01](./docs/images/parse_document01.jpg "Parse Document 01")
-
-after executing this command, the structure of the file displays. 
-You can hover to see details, but please don't edit in this window.
-
-![Parse Document 02](./docs/images/parse_document02.jpg "Parse Document 02")
+If you feel it's disturbing, re-run this command to disable Codelens.
 
 ## Requirements
 
-Make sure the file extension is x12,edi or edifact
+Make sure the file extension is .x12, .edi or .edifact.
+For .txt, it will detect the file type and apply syntax color.
 
 ## Known Issues
 
-Need your feedback. Welcome Bug Report and Enhancement Request.
+1) Delimiter like '~', '*', '+', '>' is hard-coded to recognize x12 and EDIFACT structure.
+Please make sure you are using delimiters shown in screenshots of this README.
+
+2) The purpose of this product is to reduce workload on creating Supplier side EDI documents. So it may lack of functions for Buyer to use.
 
 ## Future
-Trying to add functionality to convert to cXML or vice versa
-
-## Release Notes
-
-It's Alpha version.
-
-### 1.0.0
+Add more formats and more conversion functions
 
 ---
 

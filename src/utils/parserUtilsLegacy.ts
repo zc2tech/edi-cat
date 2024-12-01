@@ -49,6 +49,7 @@ import { ParserORDERS } from "../new_parser/edifact/parserORDERS";
 import { ParserRECADV } from "../new_parser/edifact/parserRECADV";
 import { ParserREMADV } from "../new_parser/edifact/parserREMADV";
 import { ParserUtilsBase } from "./parserUtilsBase";
+import { Parser865 } from "../new_parser/x12/parser865";
 
 /**
  * 
@@ -83,6 +84,7 @@ export class ParserUtilsLegacy extends ParserUtilsBase {
     ParserUtilsLegacy.syntaxParsers[versionKeys.X12_861_In] = new Parser861In()
     // ParserUtilsLegacy.syntaxParsers[versionKeys.X12_861_Out] = new Parser861Out()
     ParserUtilsLegacy.syntaxParsers[versionKeys.X12_862] = new Parser862()
+    ParserUtilsLegacy.syntaxParsers[versionKeys.X12_865] = new Parser865()
     ParserUtilsLegacy.syntaxParsers[versionKeys.X12_866] = new Parser866()
     ParserUtilsLegacy.syntaxParsers[versionKeys.X12_997_In] = new Parser997In()
     ParserUtilsLegacy.syntaxParsers[versionKeys.X12_997_Out] = new Parser997Out()
@@ -190,6 +192,9 @@ export class ParserUtilsLegacy extends ParserUtilsBase {
         break;
       case "862":
         return ParserUtilsLegacy.syntaxParsers[versionKeys.X12_862];
+        break;
+      case "865":
+        return ParserUtilsLegacy.syntaxParsers[versionKeys.X12_865];
         break;
       case "866":
         return ParserUtilsLegacy.syntaxParsers[versionKeys.X12_866];

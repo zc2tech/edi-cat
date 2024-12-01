@@ -60,6 +60,51 @@ export abstract class ConverterBase {
         }
     }
 
+
+    protected _float(v: string): number {
+        try {
+            let num = parseFloat(v);
+            return num;
+        } catch (error) {
+            return 0;
+        }
+    }
+    /**
+      * always return negtive number
+      * @param sAmount 
+      * 
+      */
+
+    protected _negSign(sAmount: string): string {
+        if (!sAmount) {
+            return '';
+        }
+        if (!sAmount.startsWith('-')) {
+            return this._reverseSign(sAmount);
+        } else {
+            // already negtive
+            return sAmount;
+        }
+    }
+
+    /**
+      * always return positive number
+      * @param sAmount 
+      * 
+      */
+
+    protected _posSign(sAmount: string): string {
+        if (!sAmount) {
+            return '';
+        }
+        if (sAmount.startsWith('-')) {
+            return this._reverseSign(sAmount);
+        } else {
+            // already negtive
+            return sAmount;
+        }
+    }
+
     /**
      * Used for display diagnostic path of the error segment
      * @param seg
@@ -116,13 +161,14 @@ export abstract class ConverterBase {
    */
     protected _chkBIG01(BIG: EdiSegment): boolean {
         // <InvoiceDetailRequest><InvoiceDetailRequestHeader @invoiceDate>
-        let invoiceDate = this._segVal(BIG, 1);
-        if (!Utils.parseToDateYMD(invoiceDate)) {
-            this._addCvtDiagSeg(BIG, `Invoice Date not correct, ${this._diagPath(BIG)} index:01`);
-            return false;
-        } else {
-            return true;
-        }
+        //     let invoiceDate = this._segVal(BIG, 1);
+        //     if (!Utils.parseToDateYMD(invoiceDate)) {
+        //         this._addCvtDiagSeg(BIG, `Invoice Date not correct, ${this._diagPath(BIG)} index:01`);
+        //         return false;
+        //     } else {
+        //         return true;
+        //     }
+        return true;
     }
 
     /**
@@ -132,14 +178,16 @@ export abstract class ConverterBase {
      */
     protected _chkBIG03(BIG: EdiSegment): boolean {
 
-        let orderDate = this._segVal(BIG, 3);
+        // let orderDate = this._segVal(BIG, 3);
 
-        if (!Utils.parseToDateYMD(orderDate)) {
-            this._addCvtDiagSeg(BIG, `Invoice Date not correct,  ${this._diagPath(BIG)}  index:01`);
-            return false;
-        } else {
-            return true;
-        }
+        // if (!Utils.parseToDateYMD(orderDate)) {
+        //     this._addCvtDiagSeg(BIG, `Invoice Date not correct,  ${this._diagPath(BIG)}  index:01`);
+        //     return false;
+        // } else {
+        //     return true;
+        // }
+
+        return true;
     }
 
     protected _clearDiags() {
@@ -208,7 +256,7 @@ export abstract class ConverterBase {
      * @returns 
      */
     protected _rseg(segName: string): EdiSegment | undefined {
-        let segs: EdiSegment[] | undefined = this._rsegs(segName);
+        let segs: EdiSegment[] | undefined = this._rSegs(segName);
         if (segs && segs.length > 0) {
             return segs[0];
         } else {
@@ -221,7 +269,7 @@ export abstract class ConverterBase {
      * @param fullpath 
      * @returns 
      */
-    protected _rsegs(segName: string): EdiSegment[] | undefined {
+    protected _rSegs(segName: string): EdiSegment[] | undefined {
         let nodes: ASTNode[] = this._astTree.children.filter(n => n.nodeName == segName && n.type == ASTNodeType.Segment);
 
         if (!nodes || nodes.length == 0) {
@@ -244,7 +292,12 @@ export abstract class ConverterBase {
      */
     protected _rGrps(grpName: string): ASTNode[] | undefined {
         if (this._astTree.children) {
-            return this._astTree.children.filter(n => n.nodeName == grpName && n.type == ASTNodeType.Group);
+            let rtn = this._astTree.children.filter(n => n.nodeName == grpName && n.type == ASTNodeType.Group);
+            if (!rtn) {
+                return [];
+            } else {
+                return rtn;
+            }
         }
     }
 
@@ -379,7 +432,7 @@ export abstract class ConverterBase {
      */
 
     protected _rSegByEleVal(segName: string, idx: number, expected: string): EdiSegment | undefined {
-        let segs: EdiSegment[] | undefined = this._rsegs(segName);
+        let segs: EdiSegment[] | undefined = this._rSegs(segName);
         if (!segs) {
             return undefined;
         }
@@ -397,7 +450,7 @@ export abstract class ConverterBase {
      */
 
     protected _rSegsByEleVal(segName: string, idx: number, expected: string): EdiSegment[] {
-        let segs: EdiSegment[] | undefined = this._rsegs(segName);
+        let segs: EdiSegment[] | undefined = this._rSegs(segName);
         if (!segs) {
             return undefined;
         }
@@ -417,13 +470,28 @@ export abstract class ConverterBase {
      */
 
     protected _rSegByEleVal2(segName: string, idx1: number, expected1: string, idx2: number, expected2: string): EdiSegment | undefined {
-        let segs: EdiSegment[] | undefined = this._rsegs(segName);
+        let segs: EdiSegment[] | undefined = this._rSegs(segName);
         if (!segs) {
             return undefined;
         }
         return segs.find(s => (s.getElement2(idx1)!.value == expected1 && s.getElement2(idx2)!.value == expected2));
     }
 
+    /**
+ * Divided by 100.0
+ * @param sNum 
+ */
+    protected _d100(sNum: string): string {
+        if (!sNum) {
+            return sNum;
+        }
+        try {
+            //return (parseFloat(sNum) / 100.0).toPrecision(3);
+            return (parseFloat(sNum) / 100.0).toString();
+        } catch (error) {
+            return sNum;
+        }
+    }
     /**
      * get from Children nodes with one condition
      * 
@@ -475,10 +543,10 @@ export abstract class ConverterBase {
     }
 
     /**
-     * Get only ONE segment from under Group Arrays, with 2 criteria
      * 
      * 
-     * Return at most ONE segment
+     * 
+     * 
      */
     protected _segByGrpEleVal2(grps: ASTNode[], segName: string, idx1: number, expected1: string
         , idx2: number, expected2: string): EdiSegment | undefined {
@@ -615,7 +683,7 @@ export abstract class ConverterBase {
         if (seg20Val) {
             // if SEG02 exists, we need to deal with it specially, 
             // cannot be parsed in this function.
-            return { cmt: '', lang: '' };
+            return { cmt: '', lang: 'en' };
         }
         return this._FTXcmtLang2(theSeg);
     }
@@ -634,6 +702,7 @@ export abstract class ConverterBase {
             + this._segVal(theSeg, 405);
 
         let langCode = this._segVal(theSeg, 5);
+        langCode = langCode ? langCode : 'en';
         return { cmt: cmtSeg, lang: langCode };
     }
 
@@ -708,12 +777,14 @@ export abstract class ConverterBase {
         }
         return lastKey;
     }
+
     /**
     * return the Node with name tagName
+    * Not inluce attribute !! , use _att to find attribute
     * @param nodeParent 
     * @param tagName 
     */
-    protected _xmlChild(nodeParent: XMLBuilder, childName: string): XMLBuilder {
+    protected _chd(nodeParent: XMLBuilder, childName: string): XMLBuilder {
         let xmlNode = nodeParent.find(n => n.node.nodeName == childName);
         if (!xmlNode) {
             return undefined;
@@ -730,34 +801,104 @@ export abstract class ConverterBase {
         // }
     };
 
-    protected _X12N4(grpN1: ASTNode, contact: XMLBuilder) {
+    /**
+     * value of Attribute Node
+     * Not inluce attribute !! , use _att to find attribute
+     * @param nodeParent 
+     * @param tagName 
+     */
+    protected _att(nodeParent: XMLBuilder, childName: string): string {
+        for (let n of nodeParent.node['attributes']) {
+            if (n.nodeType == n.ATTRIBUTE_NODE && n.nodeName == childName) {
+                return n.nodeValue;
+            }
+        }
+    };
+
+    /**
+     * Remove the node , if childName not set, the nodeParent is the removing object
+     * @param nodeParent 
+     * @param childName 
+     * @returns 
+     */
+    protected _rmv(nodeParent: XMLBuilder, childName?: string) {
+        let theNode: XMLBuilder;
+        if (!childName) {
+            theNode = nodeParent;
+        } else {
+            theNode = this._chd(nodeParent, childName);
+        }
+        if (theNode) {
+            theNode.remove();
+        }
+    };
+
+    /**
+* reverse sign
+* @param sAmount 
+*/
+    protected _reverseSign(sAmount: string): string {
+        if (!sAmount) {
+            return '';
+        }
+        let num;
+        try {
+            num = parseFloat(sAmount);
+        } catch (error) {
+            return '';
+        }
+
+        return (num * (-1.0)).toString();
+
+    }
+
+    /**
+     * Currently, just trim ' ' and '-',
+     * will add when needed
+     * @param str 
+     */
+    protected _trim(str: string) {
+        const regex = /^[ \-]+|[ \-]+$/g;
+        return str.replace(regex, '');
+    }
+
+
+    protected _X12N4(grpN1: ASTNode, tContact: TidyContact) {
         // N4
         let segN4 = this._dSeg1(grpN1, 'N4');
         if (!segN4) {
             return;
         }
-        let N404 = this._segVal(segN4, 4);
-        let postalAddress = this._ele2(contact, 'PostalAddress');
+        let N4_04 = this._segVal(segN4, 4);
+        let postalAddress = this._ele2(tContact.PostalAddress, 'PostalAddress');
 
         // N4 City
         postalAddress.ele('City').txt(this._segVal(segN4, 1));
 
-        // N4 State or Province Code
-        if (N404 && (N404 == 'US' || N404 == 'CA' || N404 == 'IN')) {
-            let tmpState = postalAddress.ele('State').txt(this._segVal(segN4, 2));
-            if (N404 == 'IN') {
-                tmpState.att('isoStateCode', N404 + '-' + this._segVal(segN4, 2));
+        // N4 State or Province Code, MapSpec is not identical to CIG, I follow CIG
+        let vN4_02 = this._segVal(segN4, 2);
+        if (N4_04 && (N4_04 == 'US' || N4_04 == 'CA' || N4_04 == 'IN')) {
+
+            let tmpState = postalAddress.ele('State').txt(this._mci(MAPStoXML.mapState, vN4_02));
+            if (N4_04 == 'IN') {
+                tmpState.att('isoStateCode', this._trim(N4_04 + '-' + vN4_02)).txt(vN4_02);
             }
+        } else {
+            postalAddress.ele('State').txt(vN4_02);
+        }
+
+        // N4 6
+        let vN4_06 = this._segVal(segN4, 6);
+        if (vN4_06 && !(N4_04 == 'US' || N4_04 == 'CA' || N4_04 == 'IN')) {
+            this._ele2(postalAddress, 'State').remove()
+            postalAddress.ele('State').txt(vN4_06);
         }
 
         // N4 Postal Code
         postalAddress.ele('PostalCode').txt(this._segVal(segN4, 3));
         // N4 Country Code
-        postalAddress.ele('Country').att('isoCountryCode', N404).txt(MAPStoXML.mapCountry[N404]);
-        // N4 6
-        if (N404 && !(N404 == 'US' || N404 == 'CA' || N404 == 'IN')) {
-            postalAddress.ele('State').txt(this._segVal(segN4, 6));
-        }
+        postalAddress.ele('Country').att('isoCountryCode', N4_04).txt(MAPStoXML.mapCountry[N4_04]);
+
     }
 
     /**
@@ -766,9 +907,12 @@ export abstract class ConverterBase {
      * @param tContact 
      * @param segNAD 
      */
-    protected _NADPostalAddr(tContact: TidyContact|TidyAddress, segNAD: EdiSegment) {
+    protected _NADPostalAddr(tContact: TidyContact | TidyAddress, segNAD: EdiSegment) {
         let postalAddress = tContact.PostalAddress.ele('PostalAddress');
-        postalAddress.ele('DeliverTo').txt(this._segVal(segNAD, 401));
+        let vDeliverTo = this._segVal(segNAD, 401);
+        if (vDeliverTo) {
+            postalAddress.ele('DeliverTo').txt(vDeliverTo);
+        }
         let v402 = this._segVal(segNAD, 402);
         if (v402) {
             postalAddress.ele('DeliverTo').txt(v402);
@@ -806,7 +950,11 @@ export abstract class ConverterBase {
 
         // A State or Province code or abbreviation. 
         // If DE3207 = "US" or "CA", then DE3229 is required and must be a valid two-char US State or Canadian Province code.
-        postalAddress.ele('State').txt(this._segVal(segNAD, 7));
+        let vState = this._segVal(segNAD, 7);
+        if (vState) {
+            //postalAddress.ele('State').txt(this._mci(MAPStoXML.mapState,vState));
+            postalAddress.ele('State').att('isoStateCode', vState);
+        }
 
         postalAddress.ele('PostalCode').txt(this._segVal(segNAD, 8));
 
@@ -822,14 +970,17 @@ export abstract class ConverterBase {
      * @param tContact 
      * @param segNAD 
      */
-    protected _NADPostalAddr2(tContact: TidyContact|TidyAddress, segNAD: EdiSegment) {
+    protected _NADPostalAddr2(tContact: TidyContact | TidyAddress, segNAD: EdiSegment) {
         let postalAddress = tContact.PostalAddress.ele('PostalAddress');
         let sDeliverTo = this._segVal(segNAD, 401)
             + ' ' + this._segVal(segNAD, 402)
             + ' ' + this._segVal(segNAD, 403)
             + ' ' + this._segVal(segNAD, 404)
             + ' ' + this._segVal(segNAD, 405);
-        postalAddress.ele('DeliverTo').txt(sDeliverTo.trim());
+        sDeliverTo = sDeliverTo.trim();
+        if (sDeliverTo) {
+            postalAddress.ele('DeliverTo').txt(sDeliverTo);
+        }
 
         let sStreet = this._segVal(segNAD, 501)
             + ' ' + this._segVal(segNAD, 502)
@@ -842,7 +993,7 @@ export abstract class ConverterBase {
 
         // A State or Province code or abbreviation. 
         // If DE3207 = "US" or "CA", then DE3229 is required and must be a valid two-char US State or Canadian Province code.
-        postalAddress.ele('State').txt(this._segVal(segNAD, 7));
+        postalAddress.ele('State').txt(this._mci(MAPStoXML.mapState, this._segVal(segNAD, 7)));
 
         postalAddress.ele('PostalCode').txt(this._segVal(segNAD, 8));
 
@@ -859,7 +1010,7 @@ export abstract class ConverterBase {
      * TODO:need fix after CIG fixed
      * 
      */
-    protected _xmlCommFromCTA(SG: ASTNode, tContact: TidyContact|TidyAddress, roleName: string) {
+    protected _xmlCommFromCTA(SG: ASTNode, tContact: TidyContact | TidyAddress, roleName: string) {
         let COMs = this._dSegs(SG, 'COM');
         if (!COMs || COMs.length <= 0) {
             return;
@@ -905,7 +1056,8 @@ export abstract class ConverterBase {
                         .up().ele('AreaOrCityCode').txt(this._arrVal(arrV, 1))
                         .up().ele('Number').txt(this._arrVal(arrV, 2))
                     break;
-                case 'CA': // CIG does not implement.
+                case 'AH':
+                case 'CA':
                     fragURL.ele('URL').att('name', contactName).txt(v);
                     break;
                 default:
@@ -915,8 +1067,28 @@ export abstract class ConverterBase {
 
     } // end function  _xmlCommFromCTA
 
+    /**
+     * 
+     * @param fragOrEle 
+     * @param tagName 
+     * @param vMOA102 Amount
+     * @param vMOA103 the AlternateCurrency like 'USD' 'HKD' 'JPY'
+     * @param vMOA104 4:MainCurrency  7:AlternateCurrency
+     */
     protected _fillMoney(fragOrEle: XMLBuilder, tagName: string, vMOA102: string, vMOA103: string, vMOA104: string) {
         let eMoney = this._ele3(fragOrEle, tagName, 'Money');
+        if (this._isXmlEmpty(eMoney)) {
+            // !!don't fill money amount if it's alreayd done by SG15!!
+            if (vMOA104 == '4') {
+                //eMoney =eMoney.remove().ele('Money');
+                eMoney.txt(vMOA102).att(XML.currency, vMOA103);
+            }
+        }
+        if (vMOA104 == '7') {
+            eMoney.att('alternateAmount', vMOA102).att('alternateCurrency', vMOA103);
+        }
+    }
+    protected _fillTaxMoney(eMoney: XMLBuilder, vMOA102: string, vMOA103: string, vMOA104: string) {
         if (vMOA104 == '4') {
             eMoney.txt(vMOA102).att(XML.currency, vMOA103);
         }
@@ -954,7 +1126,7 @@ export abstract class ConverterBase {
      * 
      */
     protected _header_supplier_to_buyer(cxml: XMLBuilder) {
-        let conf = vscode.workspace.getConfiguration(configuration.ediTsuya);
+        let conf = vscode.workspace.getConfiguration(configuration.ediCat);
         let buyerANID: string = conf.get(configuration.buyerANID);
         let supplierANID: string = conf.get(configuration.supplierANID);
         let currentDateTime = new Date();
@@ -968,6 +1140,11 @@ export abstract class ConverterBase {
         // To
         this._to = header.ele(XML.To);
         this._to.ele(XML.Credential).att(XML.domain, XML.NetworkID).ele(XML.Identity).txt(buyerANID);
+        let REF01v06 = this._rSegByEleVal('REF', 1, '06');
+        if (REF01v06) {
+            this._to.ele(XML.Credential).att(XML.domain, XML.SystemID)
+                .ele(XML.Identity).txt(this._segVal(REF01v06, 2));
+        }
 
         let sender = header.ele(XML.Sender);
         let cred = sender.ele(XML.Credential).att(XML.domain, XML.NetworkID)
@@ -1047,6 +1224,41 @@ export abstract class ConverterBase {
      */
     protected _mes(mapping: Object, sKey: string): boolean {
         return (sKey in mapping);
+    }
+
+    protected _PER(PER: EdiSegment, tContact: TidyContact) {
+        if (PER) {
+            let vPER1 = this._segVal(PER, 1);
+            let vPER2 = this._segVal(PER, 2); // always @name for TE/FX/EM/UR          
+            if (vPER1 == 'CN') {
+                for (let i = 3; i <= 7; i = i + 2) {
+                    let v = this._segVal(PER, i + 1);
+                    let arrV = v.split('-');
+                    switch (this._segVal(PER, i)) {
+                        case 'TE':
+                            tContact.Phone.ele('Phone').att('name', vPER2).ele('TelephoneNumber')
+                                .ele('CountryCode').att('isoCountryCode', this._arrVal(arrV, 0)).txt(MAPStoXML.mapCountry[this._arrVal(arrV, 0)])
+                                .up().ele('AreaOrCityCode').txt(this._arrVal(arrV, 1))
+                                .up().ele('Number').txt(this._arrVal(arrV, 2));
+                            break;
+                        case 'FX':
+                            tContact.Fax.ele('Fax').att('name', vPER2).ele('TelephoneNumber')
+                                .ele('CountryCode').att('isoCountryCode', '').txt(this._arrVal(arrV, 0))
+                                .up().ele('AreaOrCityCode').txt(this._arrVal(arrV, 1))
+                                .up().ele('Number').txt(this._arrVal(arrV, 2));
+                            break;
+                        case 'EM':
+                            tContact.Email.ele('Email').att('name', vPER2)
+                                .txt(v);
+                            break;
+                        case 'UR':
+                            tContact.URL.ele('URL').att('name', vPER2)
+                                .txt(v);
+                            break;
+                    }
+                } // end loop i
+            } // end if vPer1 == 'CN'
+        } // end if PER
     }
 }
 
@@ -1307,6 +1519,138 @@ export class MAPStoXML {
         "ZM": "Zambia",
         "ZR": "Zaire",
         "ZW": "Zimbabwe",
+
+    }
+    static mapState: Object = {
+        "al": "Alabama", // AL
+        "ak": "Alaska", // AK
+        "as": "American Samoa", // AS
+        "az": "Arizona", // AZ
+        "ar": "Arkansas", // AR
+        "ca": "California", // CA
+        "co": "Colorado", // CO
+        "ct": "Connecticut", // CT
+        "de": "Delaware", // DE
+        "dc": "District of Columbia", // DC
+        "fl": "Florida", // FL
+        "ga": "Georgia", // GA
+        "hi": "Hawaii", // HI
+        "id": "Idaho", // ID
+        "il": "Illinois", // IL
+        "in": "Indiana", // IN
+        "ia": "Iowa", // IA
+        "ks": "Kansas", // KS
+        "ky": "Kentucky", // KY
+        "la": "Louisiana", // LA
+        "me": "Maine", // ME
+        "md": "Maryland", // MD
+        "ma": "Massachusetts", // MA
+        "mi": "Michigan", // MI
+        "mn": "Minnesota", // MN
+        "ms": "Mississippi", // MS
+        "mo": "Missouri", // MO
+        "mt": "Montana", // MT
+        "ne": "Nebraska", // NE
+        "nv": "Nevada", // NV
+        "nh": "New Hampshire", // NH
+        "nj": "New Jersey", // NJ
+        "nm": "New Mexico", // NM
+        "ny": "New York", // NY
+        "nc": "North Carolina", // NC
+        "nd": "North Dakota", // ND
+        "oh": "Ohio", // OH
+        "ok": "Oklahoma", // OK
+        "or": "Oregon", // OR
+        "pa": "Pennsylvania", // PA
+        "pr": "Puerto Rico", // PR
+        "ri": "Rhode Island", // RI
+        "sc": "South Carolina", // SC
+        "sd": "South Dakota", // SD
+        "tn": "Tennessee", // TN
+        "tx": "Texas", // TX
+        "ut": "Utah", // UT
+        "vt": "Vermont", // VT
+        "va": "Virginia", // VA
+        "wa": "Washington", // WA
+        "wv": "West Virginia", // WV
+        "wi": "Wisconsin", // WI
+        "wy": "Wyoming", // WY
+        "ab": "Alberta", // AB
+        "bc": "British Columbia", // BC
+        "mb": "Manitoba", // MB
+        "nb": "New Brunswick", // NB
+        "nl": "Newfoundland", // NL
+        "ns": "Nova Scotia", // NS
+        "nt": "Northwest Territory", // NT
+        "nu": "Nunavut", // NU
+        "on": "Ontario", // ON
+        "pe": "Prince Edward Island", // PE
+        "qc": "Quebec", // QC
+        "sk": "Saskatchewan", // SK
+        "yt": "Yukon", // YT
+        "vic": "Victoria", // VIC
+        "nsw": "New South Wales", // NSW
+        "qld": "Queensland", // QLD
+        "wau": "Western Australia", // WAU
+        "sau": "South Australia", // SAU
+        "tas": "Tasmania", // TAS
+        "nte": "Northern Territory", // NTE
+        "act": "Australian Capital Territory", // ACT
+        "hokkaido": "Hokkaido", // Hokkaido
+        "aomori": "Aomori", // Aomori
+        "iwate": "Iwate", // Iwate
+        "miyagi": "Miyagi", // Miyagi
+        "akita": "Akita", // Akita
+        "yamagata": "Yamagata", // Yamagata
+        "fukushima": "Fukushima", // Fukushima
+        "ibaraki": "Ibaraki", // Ibaraki
+        "tochigi": "Tochigi", // Tochigi
+        "gunma": "Gunma", // Gunma
+        "saitama": "Saitama", // Saitama
+        "chiba": "Chiba", // Chiba
+        "tokyo": "Tokyo", // Tokyo
+        "kangawa": "Kangawa", // Kangawa
+        "niigata": "Niigata", // Niigata
+        "toyama": "Toyama", // Toyama
+        "ishikawa": "Ishikawa", // Ishikawa
+        "fukui": "Fukui", // Fukui
+        "yamanashi": "Yamanashi", // Yamanashi
+        "nagano": "Nagano", // Nagano
+        "gifu": "Gifu", // Gifu
+        "shizuoka": "Shizuoka", // Shizuoka
+        "aichi": "Aichi", // Aichi
+        "mie": "Mie", // Mie
+        "shiga": "Shiga", // Shiga
+        "kyoto": "Kyoto", // Kyoto
+        "osaka": "Osaka", // Osaka
+        "hyogo": "Hyogo", // Hyogo
+        "nara": "Nara", // Nara
+        "wakayama": "Wakayama", // Wakayama
+        "tottori": "Tottori", // Tottori
+        "shimane": "Shimane", // Shimane
+        "okayama": "Okayama", // Okayama
+        "hiroshima": "Hiroshima", // Hiroshima
+        "yamaguchi": "Yamaguchi", // Yamaguchi
+        "tokushima": "Tokushima", // Tokushima
+        "kagawa": "Kagawa", // Kagawa
+        "kochi": "Kochi", // Kochi
+        "fukuoka": "Fukuoka", // Fukuoka
+        "saga": "Saga", // Saga
+        "nagasaki": "Nagasaki", // Nagasaki
+        "kumamoto": "Kumamoto", // Kumamoto
+        "oita": "Oita", // Oita
+        "miyazaki": "Miyazaki", // Miyazaki
+        "kagoshima": "Kagoshima", // Kagoshima
+        "okinawa": "Okinawa", // Okinawa
+        "eastern cape": "Eastern Cape", // Eastern Cape
+        "free state": "Free State", // Free State
+        "gauteng": "Gauteng", // Gauteng
+        "kwazulu-natal": "KwaZulu-Natal", // KwaZulu-Natal
+        "mpumalanga": "Mpumalanga", // Mpumalanga
+        "north west": "North West", // North West
+        "northern cape": "Northern Cape", // Northern Cape
+        "northern province": "Northern Province", // Northern Province
+        "western cape": "Western Cape", // Western Cape
 
     }
 }

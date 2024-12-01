@@ -50,7 +50,7 @@ export namespace ediDocument {
 }
 
 export namespace configuration {
-  export const ediTsuya = "edi-cat";
+  export const ediCat = "edi-cat";
   export const enableCodelens = "enableCodelens";
   export const enableDiagnosis = "enableDiagnosis";
   export const enableHover = "enableHover";
@@ -90,7 +90,7 @@ export namespace common {
   //     url: ""
   //   }
   // };
-  export const MAP_FILE_PARSER = "MAP_FILE_PARSER";
+  export const MAP_FILE_PARSER = "MAP_FILE_PARSER_v3";
 }
 
 export namespace themeIcons {
@@ -129,6 +129,7 @@ export namespace versionKeys {
   export const X12_861_Out = "X12.861.Out"; // for backward compatibility
   //export const X12_Family_861 = [X12_861_In,X12_861_Out];
   export const X12_862 = "X12.862";
+  export const X12_865 = "X12.865";
   export const X12_866 = "X12.866";
   export const X12_997_In = "X12.997.In";
   export const X12_997_Out = "X12.997.Out";
@@ -234,6 +235,16 @@ export class XML {
   static readonly currency = 'currency';
   static readonly Money = 'Money';
   static readonly role = 'role';
+  static readonly Dimension = 'Dimension';
+  static readonly type = 'type';
+  static readonly ShortName = 'ShortName';
+  static readonly parentLineNumber = 'parentLineNumber';
+  static readonly nameXML = 'name';
+  static readonly trackingId = 'trackingId';
+  static readonly trackingDomain = 'trackingDomain';
+  static readonly category = 'category';
+  static readonly alternateCurrency = 'alternateCurrency';
+  static readonly alternateAmount = 'alternateAmount';
 }
 
 export class XMLPath {

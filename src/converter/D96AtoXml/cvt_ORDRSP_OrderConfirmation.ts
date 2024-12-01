@@ -81,7 +81,7 @@ export class Cvt_ORDRSP_OrderConfirmation extends ConverterBase {
         tConfHeader.att('type', MAPS.mapBGM4343[this._segVal(BGM, 4)]);
 
         // DTM
-        let DTMs = this._rsegs("DTM");
+        let DTMs = this._rSegs("DTM");
         DTMs = DTMs ?? [];
         for (let DTM of DTMs) {
             let vDTM101 = this._segVal(DTM, 101);
@@ -102,7 +102,7 @@ export class Cvt_ORDRSP_OrderConfirmation extends ConverterBase {
         }
 
         // FTX
-        let FTXs = this._rsegs("FTX");
+        let FTXs = this._rSegs("FTX");
         FTXs = FTXs ?? [];
         for (let f of FTXs) {
             let v1 = this._segVal(f, 1);
@@ -222,7 +222,7 @@ export class Cvt_ORDRSP_OrderConfirmation extends ConverterBase {
         }
 
         // MOA
-        let MOAs = this._rsegs('MOA');
+        let MOAs = this._rSegs('MOA');
         MOAs = MOAs ?? [];
         for (let MOA of MOAs) {
             let vMOA101 = this._segVal(MOA, 101);
@@ -315,7 +315,7 @@ export class Cvt_ORDRSP_OrderConfirmation extends ConverterBase {
                         tDetailConfStatus.SupplierBatchID.ele('SupplierBatchID').txt(vNumber);
                         break;
                 }
-            }
+            } // end loop i
         } // end loop PIAs
        
         // IMD

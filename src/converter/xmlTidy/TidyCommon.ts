@@ -32,6 +32,13 @@ export class TidyModification extends TidyBase {
         p.import(this.OriginalPrice); p.import(this.AdditionalDeduction); p.import(this.AdditionalCost);
         p.import(this.Tax); p.import(this.ModificationDetail);
     }
+    public isEmpty(): boolean {
+        return !this.OriginalPrice.some(() => true)
+            && !this.AdditionalDeduction.some(() => true)
+            && !this.AdditionalCost.some(() => true)
+            && !this.Tax.some(() => true)
+            && !this.ModificationDetail.some(() => true)
+    }
 }
 
 // <!ELEMENT TaxDetail (TaxableAmount?, TaxAmount, TaxLocation?,
@@ -46,6 +53,19 @@ export class TidyTaxDetail extends TidyBase {
         p.import(this.TaxAdjustmentAmount); p.import(this.Description); p.import(this.TriangularTransactionLawReference);
         p.import(this.TaxRegime); p.import(this.TaxExemption); p.import(this.Extrinsic);
     }
+    public copyTo(t: TidyTaxDetail): TidyTaxDetail {
+        t.TaxableAmount.import(this.TaxableAmount); t.TaxAmount.import(this.TaxAmount); t.TaxLocation.import(this.TaxLocation);
+        t.TaxAdjustmentAmount.import(this.TaxAdjustmentAmount); t.Description.import(this.Description); t.TriangularTransactionLawReference.import(this.TriangularTransactionLawReference);
+        t.TaxRegime.import(this.TaxRegime); t.TaxExemption.import(this.TaxExemption); t.Extrinsic.import(this.Extrinsic);
+        for (let k in this._objAtt) {
+            t.att(k, this._objAtt[k]);
+        }
+        return t;
+    }
+    public isEmpty(): boolean {
+        return !this.TaxAmount.some(() => true);
+    }
+
 }
 
 // <!ELEMENT Tax (Money, TaxAdjustmentAmount?, Description, TaxDetail*, Distribution*, Extrinsic*)>
@@ -56,6 +76,9 @@ export class TidyTax extends TidyBase {
     protected _subSend(p: XMLBuilder) {
         p.import(this.Money); p.import(this.TaxAdjustmentAmount); p.import(this.Description);
         p.import(this.TaxDetail); p.import(this.Distribution); p.import(this.Extrinsic);
+    }
+    public isEmpty(): boolean {
+        return !this.Money.some(() => true);
     }
 }
 
