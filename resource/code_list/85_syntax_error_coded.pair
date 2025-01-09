@@ -1,0 +1,34 @@
+2      Syntax version or level not supported
+7      Interchange recipient not actual recipient
+12     Invalid value
+13     Missing
+14     Value not supported in this position
+15     Not supported in this position
+16     Too many constituents
+17     No agreement
+18     Unspecified error
+19     Invalid decimal notation
+20     Character invalid as service character
+21     Invalid character(s)
+22     Invalid service character(s)
+23     Unknown Interchange sender
+24     Too old
+25     Test indicator not supported
+26     Duplicate detected
+27     Security function not supported
+28     References do not match
+29     Control count does not match number of instances received
+30     Functional groups and messages mixed
+31     More than one message type in group
+32     Lower level empty
+33     Invalid occurrence outside message or functional group
+34     Nesting indicator not allowed
+35     Too many segment repetitions
+36     Too many segment group repetitions
+37     Invalid type of character(s)
+38     Missing digit in front of decimal sign
+39     Data element too long
+40     Data element too short
+41     Permanent communication network error
+42     Temporary communication network error
+43     Unknown interchange recipient

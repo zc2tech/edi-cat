@@ -1,0 +1,16 @@
+102    CCYYMMDD                 Calendar date
+203    CCYYMMDDHHMM             Calendar date including time with minutes
+204    CCYYMMDDHHMMSS           Calendar date including time with seconds
+303    CCYYMMDDHHMMZZZ          See 203 plus time zone (ZZZ)
+304    CCYYMMDDHHMMSSZZZ        See 204 plus time zone (ZZZ)
+
+C=Century; Y=Year; M=Month; D=Day; H=Hour; M=Minute; S=Second; Z=Timezone
+
+Note that a complete date/time/zone is recommended. If you do not specify a time, 
+it may be taken as midnight on the date specified.
+If you do not specify a time zone, then it will be defaulted to GMT.
+The recommended codes for time zones (the ZZZ part) are to use the ISO-8601 codes +nn, -nn. However, since + is a restricted
+character, Pnn and Mnn codes are implemented to specify the hour offset from UTC. P = Plus, M = Minus.
+P01 = +01:00, P02 = +02:00 ... M01 = -01:00, M02 = -02:00, etc.
+P00 = +00:00, M00 = -00:00, GMT = UT = +00:00
+P12 = +12:00, M12 = -12:00, though they are equivalent.

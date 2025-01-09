@@ -1,0 +1,5 @@
+Run the TypeScript compiler: tsc script.ts - This will create a compiled JavaScript file named script.js.
+
+Install Node.js if you haven't done so, you can download it from here: https://nodejs.org
+
+After Node.js is installed, you can run the compiled JavaScript file with Node.js: node script.js

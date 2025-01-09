@@ -1,0 +1,13 @@
+EANCOM NAD/RFF 1153 code | SAP Business Network definition | Applies to Party Identifier Code EANCOM NAD/3035
+AMT     GST Registration Identification Number             All - excluding DP
+AP      Accounts Receivable Identification Number          Only IV
+FC      Fiscal Number                                      All - excluding DP
+GN      Government Registration Number                     All - excluding DP
+IA      Internal Vendor Number                             All - excluding DP
+IT      Company Identification Number                      All - excluding DP
+PY      Account Number                                     All - excluding DP
+SD      Department Name                                    All - excluding DP
+TL      Tax Exemption License Number                       All - excluding DP
+VA      VAT Identification Number                          All - excluding DP
+XA      Company/Place Registration Number                  All - excluding DP
+YC1     Additional Party Identification (GS1 Code)         All - excluding DP

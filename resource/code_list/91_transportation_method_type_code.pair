@@ -1,0 +1,71 @@
+6        Military Official Mail
+7        Mail
+A        Air
+AC       Air Charter
+AE       Air Express
+AF       Air Freight
+AH       Air Taxi
+AR       Armed Forces Courier Service (ARFCOS)
+B        Barge
+BP       Book Postal
+BU       Bus
+C        Consolidation
+CE       Customer Pickup / Customer's Expense
+D        Parcel Post
+DA       Driveaway Service
+DW       Driveaway, Truckaway, Towaway
+E        Expedited Truck
+ED       European or Pacific Distribution System
+F        Flyaway
+FA       Air Freight Forwarder
+FL       Motor (Flatbed)
+GG       Geographic Receiving/Shipping
+GR       Geographic Receiving
+GS       Geographic Shipping
+H        Customer Pickup
+HH       Household Goods Truck
+I        Common Irregular Carrier
+J        Motor
+K        Backhaul
+L        Contract Carrier
+LA       Logair
+LT       Less Than Trailer Load (LTL)
+M        Motor (Common Carrier)
+MB       Motor (Bulk Carrier)
+MP       Motor (Package Carrier)
+N        Private Vessel
+O        Containerized Ocean
+P        Private Carrier
+PA       Pooled Air
+PG       Pooled Piggyback
+PL       Pipeline
+PP       Pool to Pool
+PR       Pooled Rail
+PT       Pooled Truck
+Q        Conventional Ocean
+R        Rail
+RC       Rail, Less than Carload
+RR       Roadrailer
+S        Ocean
+SB       Shipper Agent
+SC       Shipper Agent (Truck)
+SD       Shipper Association
+SE       Sea/Air
+SR       Supplier Truck
+SS       Steamship
+ST       Stack Train
+T        Best Way (Shippers Option)
+TA       Towaway Service
+TC       Cab (Taxi)
+TT       Tank Truck
+U        Private Parcel Service
+VA       Motor (Van)
+VE       Vessel, Ocean
+VL       Vessel, Lake
+W        Inland Waterway
+WP       Water or Pipeline Intermodal Movement
+X        Intermodal (Piggyback)
+Y        Military Intratheater Airlift Service
+Y1       Ocean Conference Carrier
+Y2       Ocean Non-Conference Carrier
+ZZ       Other

@@ -1,0 +1,80 @@
+{
+	"name": "Electronic Data Interchange (X12)",
+	"patterns": [
+		{
+			"include": "#segments"
+		}
+	],
+	"repository": {
+		"segments": {
+			"name": "meta.segment.edi",
+			"begin": "",
+			"end": "\\~",
+			"patterns": [
+				{
+					"name": "support.class",
+					"match": "^\\W*(HL|OTI|PO1|REF\\*PO|POC|HL|RCD)"					
+				},
+				{
+					"name": "variable.other.constant",
+					"match": "^\\W*(NAD|ACK)"					
+				},
+				{
+					"name": "support.variable",
+					"match": "^\\W*(LIN|IT1)"					
+				},
+				{
+					"name": "token.debug-token",
+					"match": "^\\W*(NCD|ENT|N1)"					
+				},
+				{
+					"name": "token.warn-token",
+					"match": "^\\W*(NCA)"					
+				},
+				{
+					"name": "markup.italic",
+					"match": "^\\W*(ISA|GS|ST|BIG|BGN|BFR|BNR|BIA|BEG|BAK|BPR|BSN|BCH|BRA|BSS|AK1|SE|GE|IEA)"					
+				},
+
+				{
+					"name": "meta.segment.non-numeric",
+					"match": "(\\*|>|\\^)([^\\^>\\*~]*[^0-9\\*~\\^>\\.]+[^\\^>\\*~]*)",
+					"captures": {
+						"1": {
+							"name": "keyword.operator.segment.data-element.separator.edi"
+						},
+						"2": {
+							"name": "string.segment.data-element.edi"
+						}
+					}
+				},
+
+				{
+					"name": "meta.segment.data-element.edi",
+					"match": "(\\*|>|\\^)([\\d\\.]+)",
+					"captures": {
+						"1": {
+							"name": "keyword.operator.segment.data-element.separator.edi"
+						},
+						"2": {
+							"name": "constant.numeric"
+						}
+						
+					}
+				},	
+			
+			
+				{
+					"name": "storage.type.segment.id.edi",
+					"match": "^\\W*[\\w\\d]{2,4}"
+				},
+				{
+					"name": "keyword.operator.segment.separator.edi",
+					"match": "\\~"
+				}
+				
+			]
+		}
+	},
+	"scopeName": "text.plain.x12"
+}

@@ -1,0 +1,73 @@
+AA    Stadium Tax
+AB    Surtax
+AT    Assessment
+BP    Tax imposed on non-American Indian businesses for the privilege of conducting business on an American Indian reservation
+CA    Service Tax imposed by City
+CB    Threshold Tax
+CG    Federal Value-added Tax (GST) on Goods
+CI    Levied by a city government against the periodic fee paid by a customer in return for the right to use the property of another party
+CP    County/Parish Sales Tax
+CR    Levied by a county government against the periodic fee paid by a customer in return for the right to use the property of another party
+CS    City Sales Tax
+CT    County Tax
+CV    Federal Value-added Tax (GST) on Services
+DL    Default Labor Tax
+EQ    Equipment Tax
+ET    Tax applied to the utility and petroleum industries
+EV    Environmental Tax
+F1    FICA Tax
+F2    FICA Medicare Tax
+F3    FICA Social Security Tax
+FD    Usage tax imposed by federal (US and Canadian) government
+FF    Fuel Super Fund Tax
+FI    Federal Income Tax Withholding
+FL    Fuel L.U.S.T. Tax (Leaking Underground Storage Tank)
+FR    Tax imposed by municipality for the right to provide service
+FS    Fuel Spill Tax
+FT    Federal Excise Tax
+GR    Gross Receipts Tax
+GS    Canadian value-added tax
+HS    Canadian tax levied to fund public care and education
+HT    Tax assessed to assist the handicapped
+HZ    Hazardous Waste Tax
+LB    Labor By Trade Tax
+LO    Service tax imposed on a local level
+LS    State and Local Sales Tax
+LT    Local Sales Tax (All Applicable Sales Taxes by Taxing Authority Below the State Level)
+LU    Leaky Underground Storage Tank (LUST) Tax (federal); tax imposed in the U.S., at the federal level, for clean-up of leaky underground storage tanks
+LV    Leaky Underground Storage Tank (LUST) Tax (state); tax imposed in the U.S., at the state level, for clean-up of leaky underground storage tanks
+MA    Material Tax
+MN    Minimum Tax
+MP    Service tax imposed by a municipality
+MS    Miscellaneous State Tax
+MT    Metropolitan Transit Tax
+OH    Other Taxes
+OT    Tax imposed on telecommunication companies for the right to provide service
+PG    State or Provincial Tax on Goods
+PS    State or Provincial Tax on Services
+SA    State or Provincial Fuel Tax
+SB    Secondary Percentage Tax
+SC    Tax collection by taxing authority for schools
+SE    Usage tax imposed by state of provincial government
+SF    Superfund is a U.S. government fund created for the clean up or eradication of sites at which toxic waste, hazardous to the environment, has been dumped
+SL    State and Local tax funds, exclusive of State and Local Sales tax
+SP    State tax levied which excludes sales or excise taxes
+SR    Levied by a state government against the periodic fee paid by a customer in return for the right to use the property of another party
+SS    State Tax on Specific Labor
+ST    State Sales Tax
+SU    Tax on Equipment and Service provided
+SX    A tax imposed to pay for enhanced 911 services such as automatic call identification
+T1    Pre-threshold Tax
+T2    Post Threshold Tax
+TD    Tax imposed to recover the cost of providing TDD equipment
+TT    Tax imposed on telecommunications companies for the right to provide service or usage tax imposed. (This could be an excise tax)
+UL    Tax used to report the amount of license tax which is passed to the consumer
+UT    City or county tax for natural gas usage that is imposed upon customers
+VA    Value Added Tax
+WS    Well Service
+ZA    Tax levied to recover the cost of providing 911 emergency services within a city
+ZB    Tax levied to recover the cost of providing 911 emergency service within a county
+ZC    Usage tax imposed to recover the cost of 911 service
+ZD    Tax levied to recover the cost of providing 911 emergency service within a State
+ZE    Tax to recover the cost of 911 service
+ZZ    Mutually defined

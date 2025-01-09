@@ -1,0 +1,175 @@
+*EANCOM D01B version of list
+8       Oneway pallet
+9       Returnable pallet
+200     Pallet ISO 0 - 1/2 EURO Pallet
+201     Pallet ISO 1 - 1/1 EURO Pallet
+202     Pallet ISO 2
+203     1/4 EURO Pallet
+204     1/8 EURO Pallet
+205     Synthetic pallet ISO 1
+206     Synthetic pallet ISO 2
+210     Wholesaler pallet
+211     Pallet 80 x 100 cm
+212     Pallet 60 x 100 cm
+5L      Bag, textile
+5M      Bag, paper
+AE      Aerosol
+AH      Pallet 100cms x 110cms
+AI      Clamshell
+APE     Aluminium packed
+AT      Atomizer
+BA      Barrel
+BC      Bottlecrate, bottlerack
+BE      Bundle
+BG      Bag
+BGE     Large bag, pallet sized
+BJ      Bucket
+BL      Bale, compressed
+BM      Basin
+BME     Blister pack
+BN      Bale, non-compressed
+BO      Bottle, non-protected, cylindrical
+BR      Bar
+BRI     Brick
+BS      Bottle, non-protected, bulbous
+BU      Butt
+BX      Box
+CA      Can, rectangular
+CBL     Container bottle like
+CCE     Cardboard carrier
+CD      Can, with handle and spout
+CG      Cage
+CM      Card
+CMS     Clamshell
+CN      Container, not otherwise specified as transport equipment
+CR      Crate
+CS      Case
+CT      Carton
+CU      Cup
+CW      Cage, roll
+CX      Can, cylindrical
+CY      Cylinder
+D99     Sleeve
+DA      Crate, multiple layer, plastic
+DB      Crate, multiple layer, wooden
+DC      Crate, multiple layer, cardboard
+DG      Cage, Commonwealth Handling Equipment Pool (CHEP)
+DH      Box, Commonwealth Handling Equipment Pool (CHEP), Eurobox
+DJ      Demijohn, non-protected
+DK      Crate, bulk, cardboard
+DL      Crate, bulk, plastic
+DM      Crate, bulk, wooden
+DN      Dispenser
+DP      Demijohn, protected
+DPE     Display package
+DR      Drum
+DS      Tray, one layer no cover, plastic
+DT      Tray, one layer no cover, wooden
+DU      Tray, one layer no cover, polystyrene
+DV      Tray, one layer no cover, cardboard
+DW      Tray, two layers no cover, plastic tray
+DX      Tray, two layers no cover, wooden
+DY      Tray, two layers no cover, cardboard
+EC      Bag, plastic
+ED      Case, with pallet base
+EE      Case, with pallet base, wooden
+EF      Case, with pallet base, cardboard
+EG      Case, with pallet base, plastic
+EH      Case, with pallet base, metal
+EI      Case, isothermic
+EN      Envelope
+FOB     Folding box
+FP      Filmpack
+FPE     Foil packed
+FT      Foodtainer
+GB      Bottle, gas
+HA      Basket, with handle, plastic
+HB      Basket, with handle, wooden
+HC      Basket, with handle, cardboard
+HR      Hamper
+IA      Package, display, wooden
+IB      Package, display, cardboard
+IC      Package, display, plastic
+ID      Package, display, metal
+IE      Package, show
+IF      Package, flow
+JC      Jerrican, rectangular
+JG      Jug
+JR      Jar
+JT      Jutebag
+JY      Jerrican, cylindrical
+LAB     Labeled package
+LG      Log
+MPE     Multipack
+NE      Unpacked or unpackaged
+NU      Net, tube, plastic
+NV      Net, tube, textile
+OA      Pallet, CHEP 40 cm x 60 cm
+OB      Pallet, CHEP 80 cm x 120 cm
+OC      Pallet, CHEP 100 cm x 120 cm
+OD      Pallet, AS 4068-1993
+OE      Pallet, ISO T11
+OF      Platform, unspecified weight or dimension
+OPE     Oxygen packed
+PA      Packet
+PAE     Paper
+PB      Pallet, box
+PC      Parcel
+PD      Pallet, modular, collars 80cms x 100cms
+PE      Pallet, modular, collars 80cms x 120cms
+PG      Plate
+PJ      Punnet
+PK      Package
+PL      Pail
+PLP     Peel pack
+PO      Pouch
+POP     Cone shaped paper wrapper
+PPE     Polypropylene bag
+PU      Tray
+PUE     Tray packed in plastic
+PUN     Punnet
+PX      Pallet
+RB1     A wheeled pallet with raised rim. 81 x 67 x 135 cm (length x width x height).
+RB2     A Wheeled pallet with raised rim. 81 x 72 x 135 cm (length x width x height).
+RB3     Wheeled pallet with raised rim. 81 x 60 x 16 cm (length x width x height).
+RCB     Two sided cage on wheels with fixing strap 900 x 770 x 1513 cm (length x width x height)
+RG      Ring
+RJ      Rack, clothing hanger
+RL      Reel
+RO      Roll
+SA      Sack
+SEC     Article Surveillance
+SH      Sachet
+SL      Slipsheet
+SO      Spool
+SP      Sheet, plastic wrapping
+STL     Stick
+SW      Shrinkwrapped
+SX      Set
+T1      Tablet
+TAE     Tablet
+TB      Tub
+TEV     Tamper evident package
+THE     Three pack
+TL      Tub, with lid
+TRE     Trolley
+TTE     Tube, standing
+TU      Tube
+TV      Tube, with nozzle
+TWE     Two pack
+TY      Tank, cylindrical
+UUE     Tube net
+UVQ     Wrapped in plastic sheet
+VI      Vial
+VP      Vacuumpacked
+WRP     Wrapper
+X10     Tub with lid
+X11     Banded package
+X12     Cardboard package with grip holes for bottles
+X14     Card
+X15     Oneway pallet ISO 0 - 1/2 EURO Pallet
+X16     Oneway pallet ISO 1 - 1/1 EURO Pallet
+X17     Pallet with exceptional dimensions
+X18     Parcel with exceptional dimensions
+X3      Standard stack of stones
+X9      Pallet 100 x 110 cm

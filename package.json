@@ -1,0 +1,281 @@
+{
+  "name": "vscode-edi-cat",
+  "displayName": "EDI-Cat",
+  "description": "Editor and converter for X12/EDIFACT document",
+  "icon": "img/cat.png",
+  "version": "1.0.2",
+  "private": false,
+  "publisher": "JulianXu",
+  "author": {
+    "name": "Julian Xu",
+    "email": "julian.xu@aliyun.com"
+  },
+  "homepage": "https://github.com/zc2tech/edi-cat/blob/main/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zc2tech/edi-cat.git"
+  }, 
+  "keywords": [
+    "edicat",
+    "edi-cat",
+    "x12",
+    "EDIFACT",
+    "D96A",
+    "converter"
+  ],
+  "engines": {
+    "vscode": "^1.83.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Formatters"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "package-explorer",
+          "title": "Package Explorer",
+          "icon": "media/dep.svg"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "edi-cat.treeAssistantExplorer",
+          "name": "EDI Cat Assistant Explorer",
+          "when": "showEdiCatAssistant",
+          "icon": "./img/icon-600x600.svg",
+          "contextualTitle": "EDI Cat Assistant Explorer"
+        }
+      ]
+    },
+    "languages": [
+      {
+        "id": "edifact",
+        "aliases": [
+          "EDIFACT",
+          "EDI"
+        ],
+        "extensions": [
+          ".edi",
+          ".edifact"
+        ],
+        "configuration": "./language-configuration/edifact.json"
+      },
+      {
+        "id": "x12",
+        "aliases": [
+          "Electronic Data Interchange (X12)"
+        ],
+        "extensions": [
+          ".x12"
+        ],
+        "configuration": "./language-configuration/x12.json"
+      },
+      {
+        "id": "edidat",
+        "aliases": [
+          "EDI dat file"
+        ],
+        "extensions": [
+          ".dat",
+          ".txt"
+        ],
+        "configuration": "./language-configuration/edidat.json"
+      },
+      {
+        "id": "pair",
+        "aliases": [
+          "Key => Value pair file"
+        ],
+        "extensions": [
+          ".pair"
+        ]
+      },
+      {
+        "id": "scc",
+        "aliases": [
+          "SCC",
+          "Scc",
+          "scc"
+        ],
+        "extensions": [
+          ".scc",
+          ".SCC"
+        ],
+        "firstLine": "^(RMV|DEL)\\s+(.*?)$",
+        "configuration": "./language-configuration/scc.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "edifact",
+        "scopeName": "text.plain.edifact",
+        "path": "./tm_language/edifact.json"
+      },
+      {
+        "language": "x12",
+        "scopeName": "text.plain.x12",
+        "path": "./tm_language/x12.json"
+      },
+      {
+        "language": "pair",
+        "scopeName": "text.plain.pair",
+        "path": "./tm_language/pair.json"
+      },
+      {
+        "language": "edidat",
+        "scopeName": "text.plain.edidat",
+        "path": "./tm_language/dat.json"
+      },
+      {
+        "language": "scc",
+        "scopeName": "source.scc",
+        "path": "./tm_language/scc.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "edi-cat.test-cmd",
+        "title": "Test Cmd ",
+        "category": "EDI Cat"
+      },
+      {
+        "command": "edi-cat.refreshTreeAssistantExplorer",
+        "title": "Refresh Assistant Explorer",
+        "category": "EDI Cat",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "edi-cat.addAssistantGroupSegment",
+        "title": "Add Assistant Group/Segment",
+        "category": "EDI Cat",
+        "icon": "$(add)"
+      },
+      {
+        "command": "edi-cat.parseDocument",
+        "title": "Parse Document",
+        "category": "EDI Cat",
+        "icon": "$(add)"
+      },
+      {
+        "category": "EDI Cat",
+        "command": "edi-cat.showCodeList",
+        "title": "Open Code List"
+      },
+      {
+        "category": "EDI Cat",
+        "command": "edi-cat.convertTo",
+        "title": "Convert to ..."
+      },
+      {
+        "category": "EDI Cat",
+        "command": "edi-cat.toggleCodelens",
+        "title": "Toggle Codelens"
+      }
+    ],
+    "menus": {
+      "commandPalette": [],
+      "editor/title": [],
+      "editor/context": [],
+      "view/title": [
+        {
+          "when": "view == edi-cat.treeAssistantExplorer",
+          "command": "edi-cat.refreshTreeAssistantExplorer",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "edi-cat.addAssistantGroupSegment",
+          "when": "view == edi-cat.treeAssistantExplorer && viewItem == insertable",
+          "group": "inline"
+        }
+      ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "EDI Cat",
+      "properties": {
+        "edi-cat.enableCodelens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable codelens for EDI messages."
+        },
+        "edi-cat.enableDiagnosis": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable Diagnosis for EDI messages."
+        },
+        "edi-cat.enableHover": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable hover for EDI messages."
+        },
+        "edi-cat.buyerANID": {
+          "type": "string",
+          "default": "BUYER ANID",
+          "description": "The Buyer ANID for generated XML"
+        },
+        "edi-cat.buyerIC": {
+          "type": "string",
+          "default": "ARIBA",
+          "description": "The Buyer Interchange ID for generated EDIFACT/X12"
+        },
+        "edi-cat.buyerGP": {
+          "type": "string",
+          "default": "BUYER_GP",
+          "description": "The Buyer Group ID for generated EDIFACT/X12"
+        },
+        "edi-cat.supplierANID": {
+          "type": "string",
+          "default": "SUPPLIER ANID",
+          "description": "The Supplier ANID for generated XML"
+        },
+        "edi-cat.supplierIC": {
+          "type": "string",
+          "default": "SUPPLIER_IC",
+          "description": "The Supplier Interchange ID for generated EDIFACT/X12"
+        },
+        "edi-cat.supplierGP": {
+          "type": "string",
+          "default": "SUPPLIER_GP",
+          "description": "The Supplier Group ID for generated EDIFACT/X12"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "__esbuild-base": "esbuild src/**/*.ts src/**/*.json --bundle --outdir=out --external:vscode --format=cjs --platform=node",
+    "__dev": "npm run esbuild-base -- --sourcemap --watch",
+    "__vscode:prepublish": "npm run esbuild-base -- --minify",
+    "build": "vsce package",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+    "test-compile": "tsc -p ./",
+    "compile": "tsc -p ./",
+    "lint": "eslint \"src/**/*.ts\"",
+    "watch": "tsc -w -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^16.18.34",
+    "@types/vscode": "^1.83.0",
+    "@types/vscode-webview": "^1.57.0",
+    "@types/xmldom": "^0.1.34",
+    "@typescript-eslint/eslint-plugin": "^6.7.0",
+    "@typescript-eslint/parser": "^6.7.0",
+    "esbuild": "^0.20.1",
+    "eslint": "^8.57.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@xmldom/xmldom": "^0.8.10",
+    "date-fns-tz": "^3.0.0",
+    "xmlbuilder2": "^3.1.1",
+    "xpath": "^0.0.34"
+  }
+}

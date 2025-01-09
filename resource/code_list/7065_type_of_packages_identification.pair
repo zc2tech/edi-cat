@@ -1,0 +1,183 @@
+*UN/EDIFACT D96A version of list
+1A1    Drums, steel, non-removable head
+1A2    Drums, steel, removable head
+1B1    Drums, aluminium, non-removable head
+1B2    Drums, aluminium, removable head
+1D     Drums, plywood
+1G     Drums, fibre
+1H1    Drums, plastics, non-removable head
+1H2    Drums, plastics, removable head
+2C1    Barrels, wooden, bung type
+2C2    Barrels, wooden, removable head
+3A1    Jerricans, steel, non-removable head
+3A2    Jerricans, steel, removable head
+3H1    Jerricans, plastics, non-removable head
+3H2    Jerricans, plastics, removable head
+4A     Boxes, steel
+4B     Boxes, aluminium
+4C1    Boxes, natural wood, ordinary
+4C2    Boxes, natural wood, with sift-proof walls
+4D     Boxes, plywood
+4F     Boxes, reconstituted wood
+4G     Boxes, fibreboard
+4H1    Boxes, plastics, expanded
+4H2    Boxes, plastics, solid
+5H1    Bags, woven plastics, without inner liner or coating
+5H2    Bags, woven plastics, sift-proof
+5H3    Bags, woven plastics, water resistant
+5H4    Bags, plastics film
+5L1    Bags, textile, without inner liner or coating
+5L2    Bags, textile, sift-proof
+5L3    Bags, textile, water resistant
+5M1    Bags, paper, multiwall
+5M2    Bags, paper, multiwall, water resistant
+6HA    Composite packagings, plastics receptacle, in steel
+6HB    Composite packagings, plastics receptacle, in
+6HC    Composite packagings, plastics receptacle, wooden box
+6HD    Composite packagings, plastics receptacle, in
+6HG    Composite packagings, plastics receptacle, in fibre
+6HH    Composite packagings, plastics receptacle, in
+6PA    Composite packagings, glass, porcelain or stoneware
+6PB    Composite packagings, glass, porcelain or stoneware
+6PC    Composite packagings, glass, porcelain or stoneware
+6PD    Composite packagings, glass, porcelain or stoneware
+6PG    Composite packagings, glass, porcelain or stoneware
+6PH    Composite packagings, glass, porcelain or stoneware
+AE     Aerosol
+AM     Ampoule, non-protected
+AP     Ampoule, protected
+AT     Atomizer
+BA     Barrel
+BB     Bobbin
+BC     Bottlecrate, bottlerack
+BD     Board
+BE     Bundle
+BF     Balloon, non-protected
+BG     Bag
+BH     Bunch
+BI     Bin
+BJ     Bucket
+BK     Basket
+BL     Bale, compressed
+BN     Bale, non-compressed
+BO     Bottle, non-protected, cylindrica
+BP     Balloon, protected
+BQ     Bottle, protected cylindrical
+BR     Bar
+BS     Bottle, non-protected, bulbous
+BT     Bolt
+BU     Butt
+BV     Bottle, protected bulbous
+BX     Box
+BY     Board, in bundle/bunch/truss
+BZ     Bars, in bundle/bunch/truss
+CA     Can, rectangular
+CB     Beer crate
+CC     Churn
+CE     Creel
+CF     Coffer
+CG     Cage
+CH     Chest
+CI     Canister
+CJ     Coffin
+CK     Cask
+CL     Coil
+CO     Carboy, non-protected
+CP     Carboy, protected
+CR     Crate
+CS     Case
+CT     Carton
+CU     Cup
+CV     Cover
+CX     Can, cylindrical
+CY     Cylinder
+CZ     Canvas
+DJ     Demijohn, non-protected
+DP     Demijohn, protected
+DR     Drum
+EN     Envelope
+FC     Fruit crate
+FD     Framed crate
+FI     Firkin
+FL     Flask
+FO     Footlocker
+FP     Filmpack
+FR     Frame
+GB     Gas bottle
+GI     Girder
+GZ     Girders, in bundle/bunch/truss
+HG     Hogshead
+HR     Hamper
+IN     Ingot
+IZ     Ingots, in bundle/bunch/truss
+JC     Jerrican, rectangular
+JG     Jug
+JR     Jar
+JT     Jutebag
+JY     Jerrican, cylindrical
+KG     Keg
+LG     Log
+LZ     Logs, in bundle/bunch/truss
+MB     Multiply bag
+MC     Milk crate
+MS     Multiwall sack
+MT     Mat
+MX     Match box
+NE     Unpacked or unpackaged
+NS     Nest
+NT     Net
+PA     Packet
+PC     Parcel
+PG     Plate
+PH     Pitcher
+PI     Pipe
+PK     Package
+PL     Pail
+PN     Plank
+PO     Pouch
+PT     Pot
+PU     Tray
+PU     Tray pack
+PY     Plates, in bundle/bunch/truss
+PZ     Pipes, in bundle/bunch/truss
+PZ     Planks, in bundle/bunch/truss
+RD     Rod
+RG     Ring
+RL     Reel
+RO     Roll
+RT     Rednet
+RZ     Rods, in bundle/bunch/truss
+SA     Sack
+SC     Shallow crate
+SD     Spindle
+SE     Sea-chest
+SH     Sachet
+SK     Skeleton case
+SL     Slipsheet
+SM     Sheetmetal
+ST     Sheet
+SU     Suitcase
+SW     Shrinkwrapped
+SZ     Sheets, in bundle/bunch/truss
+TB     Tub
+TC     Tea-chest
+TD     Collapsible tube
+TD     Tube, collapsible
+TK     Tank, rectangular
+TN     Tin
+TO     Tun
+TR     Trunk
+TS     Truss
+TU     Tube
+TY     Tank, cylindrical
+TZ     Tubes, in bundle/bunch/truss
+VA     Vat
+VG     Bulk, gas (at 1031 mbar and 15/C)
+VI     Vial
+VL     Bulk, liquid
+VO     Bulk, solid, large particles (nodules)
+VP     Vacuumpacked
+VQ     Bulk, liquefied gas (at abnormal temperature/pressure)
+VR     Bulk, solid, granular particles (grains)
+VY     Bulk, solid, fine particles (powders)
+WB     Wickerbottle
