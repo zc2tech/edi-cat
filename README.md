@@ -57,6 +57,11 @@ Some fields need a list to explore, you can click the link for details
 
 ![Link in Hover menu](./docs/images/hover02.jpg "Link in Hover menu")
 
+##### Extension Config
+Some VSCode settings you may want to adjust when using conversion functionality
+
+![Link in Extension Config](./docs/images/extension_config.png "Link in Extension Config")
+
 ##### Codelists
 Use menu "View->Command Palette..." and search for "Open Code List",
 
