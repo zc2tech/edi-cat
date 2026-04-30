@@ -9,3 +9,4 @@ tsconfig.lsif.json
 *.db
 *.vsix
 docs/demo_file/big_file.dat
+docs/
