@@ -1,7 +1,7 @@
 # Change Log
 
 ##### 2.0.1
-- INVRPTC <=> cXML ConsignmentsWithdrawal
+- INVRPTC <=> cXML ConsignmentWithdrawal
 - DELFORP => cXML Forecast
 - ORDERS/ORDCHG <=> cXML PurchaseOrder/Change
 - DESADV <=> cXML ShipNotice
