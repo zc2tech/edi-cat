@@ -1,4 +1,19 @@
 # Change Log
+
+##### 2.0.1
+- INVRPTC <=> cXML ConsignmentsWithdrawal
+- DELFORP => cXML Forecast
+- ORDERS/ORDCHG <=> cXML PurchaseOrder/Change
+- DESADV <=> cXML ShipNotice
+- INVOIC <=> cXML Invoice
+- 850/860 <=> cXML PurchaseOrder
+- 856 <=> cXML ShipNotice
+- 855 <=> cXML OrderConfirmation
+- 810 <=> cXML Invoice
+- 846 => cXML ConsignmentWithdrawal
+- 861 => cXML GoodsReceipt
+- cXML GoodsReceipt => RECADV
+
 ##### 1.0.9
 - Add support for X12 940 (Warehouse Shipping Order) parser and info class
 - Add support for X12 945 (Warehouse Shipping Advice) parser and info class
