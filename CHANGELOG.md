@@ -1,5 +1,15 @@
 # Change Log
 
+##### 2.0.2
+- fix PRI segment for ORDRSP
+- fix ambiguity for hover info/usage for INVOIC,INVRPTC,830D
+- fix minor issue for 850/860 <=> cXML PurchaseOrder
+- adjust TOD and FTX+ARR in DESADV conversion to be more precise
+- fix closeForReceiving for RECADV
+- improve phone/tel/fax part of INVRPTC <=> cXML ConsignmentWithdrawal
+- remove unnecessary cXML Dimension elements for 856 => cXML ShipNotice
+- accommodate root->N1->FOB and LIN->N1->FOB in 830D parser
+
 ##### 2.0.1
 - INVRPTC <=> cXML ConsignmentWithdrawal
 - DELFORP => cXML Forecast
